@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+<item android:id="@+id/item_book"
+    android:title="@string/category_books"
+    android:icon="@drawable/ic_book_white_48px" />
+
+<item android:id="@+id/item_food"
+    android:title="@string/item_food"
+    android:icon="@drawable/ic_food_white_48px" />
+
+<item android:id="@+id/item_shop"
+    android:title="@string/category_shops"
+    android:icon="@drawable/ic_shop_white_48px" />
+
+    <item android:id="@+id/item_event"
+        android:title="@string/category_events"
+        android:icon="@drawable/ic_event_white_48px" />
+
+</menu>
