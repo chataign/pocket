@@ -1,4 +1,4 @@
-package com.example.fchataigner.mypocket;
+package com.example.fchataigner.pocket;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -25,7 +25,7 @@ public class EventFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        return inflater.inflate(R.layout.itemlist_fragment, container, false);
+        return inflater.inflate(com.example.fchataigner.pocket.R.layout.itemlist_fragment, container, false);
     }
 
     @Override

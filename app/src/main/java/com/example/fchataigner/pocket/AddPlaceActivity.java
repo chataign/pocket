@@ -1,9 +1,8 @@
-package com.example.fchataigner.mypocket;
+package com.example.fchataigner.pocket;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -26,7 +25,7 @@ public class AddPlaceActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_place_activity);
+        setContentView(com.example.fchataigner.pocket.R.layout.add_place_activity);
     }
 
     public void onAddItemClicked(View view)
@@ -38,21 +37,21 @@ public class AddPlaceActivity extends Activity
         double longitude = extras.getDouble(EXTRA_LONGITUDE);
         double search_radius = extras.getDouble(EXTRA_SEARCH_RADIUS);
 
-        TextView text_view = findViewById( R.id.search_text );
+        TextView text_view = findViewById( com.example.fchataigner.pocket.R.id.search_text );
 
         String search_text = text_view.getText().toString();
         String[] search_strings = search_text.split(" ");
 
         switch( item_type )
         {
-            case R.id.item_food:
+            case com.example.fchataigner.pocket.R.id.item_food:
             {
                 FindPlace placeFinder = new FindPlace( this.getApplicationContext(), this,
                         latitude, longitude, search_radius, "food" );
                 placeFinder.execute( search_strings );
                 break;
             }
-            case R.id.item_shop:
+            case com.example.fchataigner.pocket.R.id.item_shop:
             {
                 FindPlace placeFinder = new FindPlace( this.getApplicationContext(), this,
                         latitude, longitude, search_radius, "store" );
@@ -77,7 +76,7 @@ public class AddPlaceActivity extends Activity
     {
         this.places = places;
 
-        ListView results = findViewById(R.id.search_results);
+        ListView results = findViewById(com.example.fchataigner.pocket.R.id.search_results);
         results.setAdapter( new ItemAdapter<Place>( this.getApplicationContext(), this.places ) );
         results.setOnItemClickListener(this);
     }

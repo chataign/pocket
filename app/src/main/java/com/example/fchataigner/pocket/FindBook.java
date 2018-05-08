@@ -1,4 +1,4 @@
-package com.example.fchataigner.mypocket;
+package com.example.fchataigner.pocket;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -37,7 +37,7 @@ public class FindBook extends AsyncTask< String, Void, ArrayList<Book> >
         this.listener = listener;
         books = new ArrayList<Book>();
         requestQueue = Volley.newRequestQueue(context);
-        baseUrl = context.getString(R.string.book_api_url);
+        baseUrl = context.getString(com.example.fchataigner.pocket.R.string.book_api_url);
         requestsPending=0;
     }
 

@@ -1,9 +1,8 @@
-package com.example.fchataigner.mypocket;
+package com.example.fchataigner.pocket;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -21,12 +20,12 @@ public class AddBookActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_book_activity);
+        setContentView(com.example.fchataigner.pocket.R.layout.add_book_activity);
     }
 
     public void onAddItemClicked(View view)
     {
-        TextView text_view = findViewById( R.id.search_text );
+        TextView text_view = findViewById( com.example.fchataigner.pocket.R.id.search_text );
 
         String search_text = text_view.getText().toString();
         String[] search_strings = search_text.split(" ");
@@ -51,10 +50,10 @@ public class AddBookActivity extends Activity
     {
         this.books = books;
 
-        TextView text = findViewById(R.id.text);
+        TextView text = findViewById(com.example.fchataigner.pocket.R.id.text);
         text.setText( String.format("Found %d results", books.size() ) );
 
-        ListView results = findViewById(R.id.search_results);
+        ListView results = findViewById(com.example.fchataigner.pocket.R.id.search_results);
         results.setAdapter( new ItemAdapter<Book>( this.getApplicationContext(), this.books ) );
         results.setOnItemClickListener(this);
     }

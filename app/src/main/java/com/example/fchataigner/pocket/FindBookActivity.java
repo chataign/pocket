@@ -1,4 +1,4 @@
-package com.example.fchataigner.mypocket;
+package com.example.fchataigner.pocket;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -38,7 +38,7 @@ public class FindBookActivity extends Activity implements AdapterView.OnItemClic
         try { photoFile = createFile( "yyyyMMdd_HHmmss", ".jpg "); }
         catch( IOException ex ) { Log.e( "createFile", ex.getMessage() ); return; }
 
-        photoUri = FileProvider.getUriForFile( this, "com.example.fchataigner.mypocket.fileprovider", photoFile );
+        photoUri = FileProvider.getUriForFile( this, "com.example.fchataigner.pocket.fileprovider", photoFile );
         Log.i( "StartCapture", photoUri.getPath() );
 
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -74,7 +74,7 @@ public class FindBookActivity extends Activity implements AdapterView.OnItemClic
             //ImageView imgview = (ImageView) findViewById(R.id.img);
             //imgview.setImageBitmap(scaled);
 
-            ListView bookFindList = (ListView) findViewById(R.id.book_find_list);
+            ListView bookFindList = (ListView) findViewById(com.example.fchataigner.pocket.R.id.book_find_list);
             bookFindList.setOnItemClickListener(this);
 
             BookFinder bookFinder = new BookFinder( this.getApplicationContext(), bookFindList );
@@ -86,6 +86,6 @@ public class FindBookActivity extends Activity implements AdapterView.OnItemClic
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.find_book);
+        setContentView(com.example.fchataigner.pocket.R.layout.find_book);
     }
 }

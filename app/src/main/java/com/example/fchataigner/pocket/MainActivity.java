@@ -1,4 +1,4 @@
-package com.example.fchataigner.mypocket;
+package com.example.fchataigner.pocket;
 
 import android.Manifest;
 import android.location.LocationListener;
@@ -34,23 +34,23 @@ public class MainActivity extends AppCompatActivity
 
         switch( item_id )
         {
-            case R.id.item_book:
-                title = getString(R.string.category_books);
-                args.putInt( "file_resource", R.string.books_file );
+            case com.example.fchataigner.pocket.R.id.item_book:
+                title = getString(com.example.fchataigner.pocket.R.string.category_books);
+                args.putInt( "file_resource", com.example.fchataigner.pocket.R.string.books_file );
                 fragment = new ItemListFragment<Book>();
                 break;
-            case R.id.item_food:
-                title = getString(R.string.item_food);
-                args.putInt( "file_resource", R.string.places_file );
+            case com.example.fchataigner.pocket.R.id.item_food:
+                title = getString(com.example.fchataigner.pocket.R.string.item_food);
+                args.putInt( "file_resource", com.example.fchataigner.pocket.R.string.places_file );
                 fragment = new ItemListFragment<Place>();
                 break;
-            case R.id.item_shop:
-                title = getString(R.string.category_shops);
-                args.putInt( "file_resource", R.string.places_file );
+            case com.example.fchataigner.pocket.R.id.item_shop:
+                title = getString(com.example.fchataigner.pocket.R.string.category_shops);
+                args.putInt( "file_resource", com.example.fchataigner.pocket.R.string.places_file );
                 fragment = new ItemListFragment<Place>();
                 break;
-            case R.id.item_event:
-                title = getString(R.string.category_events);
+            case com.example.fchataigner.pocket.R.id.item_event:
+                title = getString(com.example.fchataigner.pocket.R.string.category_events);
                 fragment = new EventFragment();
                 break;
         }
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, fragment)
+                .replace(com.example.fchataigner.pocket.R.id.fragment_container, fragment)
                 .addToBackStack(null)
                 .commit();
         return true;
@@ -95,8 +95,8 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.main_activity);
-        setSupportActionBar( (Toolbar) findViewById(R.id.toolbar) );
+        setContentView(com.example.fchataigner.pocket.R.layout.main_activity);
+        setSupportActionBar( (Toolbar) findViewById(com.example.fchataigner.pocket.R.id.toolbar) );
 
         //getSupportActionBar().setDisplayShowHomeEnabled(true);
         //getSupportActionBar().setIcon(R.mipmap.ic_pocket);
@@ -121,9 +121,9 @@ public class MainActivity extends AppCompatActivity
         try { location_manager.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 5000, 10, this ); }
         catch( SecurityException ex ) { Log.e( "onCreate", ex.getMessage() ); }
 
-        BottomNavigationView navigation = findViewById(R.id.bottom_navigation);
+        BottomNavigationView navigation = findViewById(com.example.fchataigner.pocket.R.id.bottom_navigation);
         navigation.setOnNavigationItemSelectedListener(this);
 
-        loadFragment( R.id.item_book );
+        loadFragment( com.example.fchataigner.pocket.R.id.item_book );
     }
 }

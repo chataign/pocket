@@ -1,10 +1,9 @@
-package com.example.fchataigner.mypocket;
+package com.example.fchataigner.pocket;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,7 +15,6 @@ import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 public class Book implements Parcelable, JSONable, Adaptable
@@ -47,47 +45,47 @@ public class Book implements Parcelable, JSONable, Adaptable
 
     private Book() {}
 
-    @Override public int listLayout() { return R.layout.book_item; }
-    @Override public int detailsLayout() { return R.layout.book_details; }
-    @Override public int fileResource() { return R.string.books_file; }
+    @Override public int listLayout() { return com.example.fchataigner.pocket.R.layout.book_item; }
+    @Override public int detailsLayout() { return com.example.fchataigner.pocket.R.layout.book_details; }
+    @Override public int fileResource() { return com.example.fchataigner.pocket.R.string.books_file; }
 
     @Override
     public void createListView( View view )
     {
-        ImageView image = view.findViewById(R.id.thumbnail);
+        ImageView image = view.findViewById(com.example.fchataigner.pocket.R.id.thumbnail);
 
         try { Picasso.get().load(thumbnail).into(image); }
-        catch( Exception ex ) { image.setImageResource( R.drawable.ic_launcher_background ); }
+        catch( Exception ex ) { image.setImageResource( com.example.fchataigner.pocket.R.drawable.ic_launcher_background ); }
 
-        TextView title_view = view.findViewById(R.id.title);
+        TextView title_view = view.findViewById(com.example.fchataigner.pocket.R.id.title);
         title_view.setText( title );
 
-        TextView author_view = view.findViewById(R.id.author);
+        TextView author_view = view.findViewById(com.example.fchataigner.pocket.R.id.author);
         author_view.setText(author);
     }
 
     @Override
     public void createDetailView( View view )
     {
-        ImageView image = (ImageView) view.findViewById(R.id.thumbnail);
+        ImageView image = (ImageView) view.findViewById(com.example.fchataigner.pocket.R.id.thumbnail);
         Picasso.get().load(thumbnail).into(image);
 
-        TextView title_view = (TextView) view.findViewById(R.id.title);
+        TextView title_view = (TextView) view.findViewById(com.example.fchataigner.pocket.R.id.title);
         title_view.setText(title);
 
-        TextView author_view = (TextView) view.findViewById(R.id.author);
+        TextView author_view = (TextView) view.findViewById(com.example.fchataigner.pocket.R.id.author);
         author_view.setText(author);
 
-        TextView ratings = (TextView) view.findViewById(R.id.ratings);
+        TextView ratings = (TextView) view.findViewById(com.example.fchataigner.pocket.R.id.ratings);
         ratings.setText( String.format("rating: %.1f (%d reviews)", averageRating, ratingsCount ) );
 
-        TextView description_view = (TextView) view.findViewById(R.id.description);
+        TextView description_view = (TextView) view.findViewById(com.example.fchataigner.pocket.R.id.description);
         description_view.setText( description );
 
-        TextView publisher_view = (TextView) view.findViewById(R.id.publisher);
+        TextView publisher_view = (TextView) view.findViewById(com.example.fchataigner.pocket.R.id.publisher);
         publisher_view.setText( publisher );
 
-        TextView date_view = (TextView) view.findViewById(R.id.date);
+        TextView date_view = (TextView) view.findViewById(com.example.fchataigner.pocket.R.id.date);
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         try { int year = format.parse(date).getYear(); date_view.setText( year ); }
         catch( Exception ex ) { date_view.setText(date); }

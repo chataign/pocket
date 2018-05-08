@@ -1,4 +1,4 @@
-package com.example.fchataigner.mypocket;
+package com.example.fchataigner.pocket;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -43,8 +43,8 @@ public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
         this.type = type;
         this.search_radius = search_radius;
         this.requestQueue = Volley.newRequestQueue(context);
-        this.baseUrl = context.getString(R.string.places_api_url);
-        this.apiKey = context.getString(R.string.google_api_key);
+        this.baseUrl = context.getString(com.example.fchataigner.pocket.R.string.places_api_url);
+        this.apiKey = context.getString(com.example.fchataigner.pocket.R.string.google_api_key);
     }
 
     @Override

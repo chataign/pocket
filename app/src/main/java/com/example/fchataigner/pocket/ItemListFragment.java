@@ -1,4 +1,4 @@
-package com.example.fchataigner.mypocket;
+package com.example.fchataigner.pocket;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -37,7 +37,7 @@ public class ItemListFragment<T extends Parcelable & Adaptable & JSONable>
         int file_resource = args.getInt("file_resource");
 
         itemlist = new ItemList<T>( getContext(), file_resource );
-        return inflater.inflate(R.layout.itemlist_fragment, container, false);
+        return inflater.inflate(com.example.fchataigner.pocket.R.layout.itemlist_fragment, container, false);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ItemListFragment<T extends Parcelable & Adaptable & JSONable>
     {
         super.onStart();
 
-        ListView list = (ListView) getView().findViewById(R.id.list);
+        ListView list = (ListView) getView().findViewById(com.example.fchataigner.pocket.R.id.list);
 
         list.setAdapter( itemlist.adapter );
         list.setOnItemClickListener(this);
@@ -53,7 +53,7 @@ public class ItemListFragment<T extends Parcelable & Adaptable & JSONable>
 
         vibrator = (Vibrator) getContext().getSystemService(VIBRATOR_SERVICE);
 
-        FloatingActionButton add_button = (FloatingActionButton) getView().findViewById(R.id.add_button);
+        FloatingActionButton add_button = (FloatingActionButton) getView().findViewById(com.example.fchataigner.pocket.R.id.add_button);
         add_button.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -80,7 +80,7 @@ public class ItemListFragment<T extends Parcelable & Adaptable & JSONable>
             try
             {
                 Bundle bundle = intent.getExtras();
-                itemlist.add( (T) bundle.getParcelable(getContext().getString(R.string.bundle_item) ) );
+                itemlist.add( (T) bundle.getParcelable(getContext().getString(com.example.fchataigner.pocket.R.string.bundle_item) ) );
             }
             catch( Exception ex )
             {
@@ -93,13 +93,13 @@ public class ItemListFragment<T extends Parcelable & Adaptable & JSONable>
     public void onItemClick(AdapterView<?> list, View view, int position, long id )
     {
         Bundle bundle = new Bundle();
-        bundle.putParcelable( getContext().getString(R.string.bundle_item), itemlist.get(position) );
+        bundle.putParcelable( getContext().getString(com.example.fchataigner.pocket.R.string.bundle_item), itemlist.get(position) );
 
         Fragment fragment = new ItemDetailsFragment<T>();
         fragment.setArguments(bundle);
 
         getFragmentManager().beginTransaction()
-                .replace( R.id.fragment_container, fragment )
+                .replace( com.example.fchataigner.pocket.R.id.fragment_container, fragment )
                 .addToBackStack(null)
                 .commit();
     }
@@ -117,8 +117,8 @@ public class ItemListFragment<T extends Parcelable & Adaptable & JSONable>
             public void onClick(View v) { itemlist.undelete(); }
         };
 
-        Snackbar snackbar = Snackbar.make( getView(), R.string.item_deleted, Snackbar.LENGTH_SHORT);
-        snackbar.setAction(R.string.undo, undo_callback );
+        Snackbar snackbar = Snackbar.make( getView(), com.example.fchataigner.pocket.R.string.item_deleted, Snackbar.LENGTH_SHORT);
+        snackbar.setAction(com.example.fchataigner.pocket.R.string.undo, undo_callback );
         snackbar.show();
 
         return true;

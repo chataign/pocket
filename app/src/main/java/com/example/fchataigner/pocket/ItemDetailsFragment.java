@@ -1,8 +1,7 @@
-package com.example.fchataigner.mypocket;
+package com.example.fchataigner.pocket;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,7 @@ public class ItemDetailsFragment<T extends Adaptable> extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         Bundle args = this.getArguments();
-        T item = (T) args.getParcelable(getContext().getString(R.string.bundle_item));
+        T item = (T) args.getParcelable(getContext().getString(com.example.fchataigner.pocket.R.string.bundle_item));
 
         View view = inflater.inflate( item.detailsLayout(), container, false);
         item.createDetailView(view);

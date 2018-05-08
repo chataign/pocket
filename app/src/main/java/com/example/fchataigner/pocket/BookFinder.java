@@ -1,4 +1,4 @@
-package com.example.fchataigner.mypocket;
+package com.example.fchataigner.pocket;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,9 +6,7 @@ import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.util.Log;
 import android.util.SparseArray;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -28,7 +26,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 public class BookFinder extends AsyncTask< Bitmap, Void, ArrayList<Book> >
         implements Response.ErrorListener, Response.Listener<JSONObject>
@@ -51,7 +48,7 @@ public class BookFinder extends AsyncTask< Bitmap, Void, ArrayList<Book> >
         frameBuilder = new Frame.Builder();
         textDetector = new TextRecognizer.Builder(context).build();
         requestQueue = Volley.newRequestQueue(context);
-        baseUrl = context.getString(R.string.book_api_url);
+        baseUrl = context.getString(com.example.fchataigner.pocket.R.string.book_api_url);
         requestsPending=0;
     }
 

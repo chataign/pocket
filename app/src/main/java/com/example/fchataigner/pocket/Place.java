@@ -1,4 +1,4 @@
-package com.example.fchataigner.mypocket;
+package com.example.fchataigner.pocket;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -24,21 +24,21 @@ public class Place implements Parcelable, JSONable, Adaptable
 
     private Place() {}
 
-    @Override public int listLayout() { return R.layout.place_item; }
+    @Override public int listLayout() { return com.example.fchataigner.pocket.R.layout.place_item; }
     @Override public int detailsLayout() { return 0; }
-    @Override public int fileResource() { return R.string.places_file; }
+    @Override public int fileResource() { return com.example.fchataigner.pocket.R.string.places_file; }
 
     public void createListView( View view )
     {
-        ImageView image_view = view.findViewById(R.id.icon);
+        ImageView image_view = view.findViewById(com.example.fchataigner.pocket.R.id.icon);
 
         try { Picasso.get().load(icon).into(image_view); }
-        catch( Exception ex ) { image_view.setImageResource( R.drawable.ic_launcher_background ); }
+        catch( Exception ex ) { image_view.setImageResource( com.example.fchataigner.pocket.R.drawable.ic_launcher_background ); }
 
-        TextView name_field = view.findViewById(R.id.name);
+        TextView name_field = view.findViewById(com.example.fchataigner.pocket.R.id.name);
         name_field.setText( name );
 
-        TextView type_field = view.findViewById(R.id.type);
+        TextView type_field = view.findViewById(com.example.fchataigner.pocket.R.id.type);
         String type = types.get(0);
         if ( type != null ) type_field.setText( type );
     }
