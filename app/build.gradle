@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.example.fchataigner.mypocket"
+        applicationId 'com.fchataigner.pocket'
         minSdkVersion 15
         targetSdkVersion 27
         versionCode 1
@@ -17,10 +17,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'android.arch.persistence.room:runtime:1.0.0'
     implementation 'com.android.support:support-v4:27.1.1'
