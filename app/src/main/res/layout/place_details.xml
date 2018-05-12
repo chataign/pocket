@@ -1,38 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="80dp">
+    android:layout_height="match_parent">
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
 
     <ImageView
         android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:padding="5dp" />
 
     <TextView
         android:id="@+id/name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/icon"
         android:layout_toRightOf="@id/icon"
-        android:padding="5dp"
         android:textColor="@android:color/black"
-        android:textSize="10pt"
-        android:textStyle="bold" />
+        android:textSize="12pt"
+        android:textStyle="bold"
+        android:padding="5dp" />
 
     <TextView
         android:id="@+id/vicinity"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/name"
-        android:layout_toRightOf="@id/icon"
         android:padding="5dp"
         android:textColor="@android:color/black"
-        android:textSize="8pt"
-        android:textStyle="italic" />
+        android:textSize="8pt" />
+
+    <TextView
+        android:id="@+id/types"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/vicinity"
+        android:padding="5dp"
+        android:textColor="@android:color/black"
+        android:textStyle="italic"
+        android:textSize="8pt" />
 
 </RelativeLayout>
+
+</ScrollView>

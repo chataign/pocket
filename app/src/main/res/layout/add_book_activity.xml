@@ -14,20 +14,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="book title, author"
+            android:imeOptions="actionDone"
             android:singleLine="true" />
 
     </android.support.design.widget.TextInputLayout>
 
-    <Button
-        android:id="@+id/search_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onAddItemClicked"
-        android:text="search"
-        android:visibility="visible" />
-
     <TextView
-        android:id="@+id/text"
+        android:id="@+id/search_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="false"

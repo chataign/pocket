@@ -7,17 +7,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class ItemDetailsFragment<T extends Adaptable> extends Fragment
+public class ItemDetailsFragment<Item extends Displayable> 
+        extends Fragment
         implements Button.OnClickListener
 {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         Bundle args = this.getArguments();
-        T item = (T) args.getParcelable(getContext().getString(com.example.fchataigner.pocket.R.string.bundle_item));
+        String bundle_item = getContext().getString(R.string.bundle_item);
+        Item item = (Item) args.getParcelable(bundle_item);
 
-        View view = inflater.inflate( item.detailsLayout(), container, false);
-        item.createDetailView(view);
+        View view = inflater.inflate( item.getDetailsLayout(), container, false);
+        item.createDetailsView(view);
+
         return view;
     }
 
@@ -27,7 +30,7 @@ public class ItemDetailsFragment<T extends Adaptable> extends Fragment
         /*
         if ( item != null )
         {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(book.link) );
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.link) );
             startActivity(intent);
         }
         */

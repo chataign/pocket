@@ -13,23 +13,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.Cloneable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class Book implements Parcelable, JSONable, Adaptable
+public class Book implements Parcelable, JSONable, Comparable<Book>, Displayable, Cloneable
 {
-    public class Builder implements JSONable.Builder<Book>
-    {
-        @Override
-        public Book buildFromJSON( JSONObject json ) throws JSONException
-        {
-            Book book = new Book();
-            book.readJSON(json);
-            return book;
-        }
-    }
-
     public String isbn_13;
     public String isbn_10;
     public String title;
@@ -43,49 +33,57 @@ public class Book implements Parcelable, JSONable, Adaptable
     public String publisher;
     public String date;
 
-    private Book() {}
+    public Book() {}
 
-    @Override public int listLayout() { return com.example.fchataigner.pocket.R.layout.book_item; }
-    @Override public int detailsLayout() { return com.example.fchataigner.pocket.R.layout.book_details; }
-    @Override public int fileResource() { return com.example.fchataigner.pocket.R.string.books_file; }
+    @Override
+    public int getDetailsLayout() { return R.layout.book_details; }
+
+    @Override
+    public int getItemLayout() { return R.layout.book_item; }
+
+    @Override
+    public int getFileResource() { return R.string.books_file; }
+
+    @Override
+    public Class<?> getAddItemClass() { return AddBookActivity.class; }
 
     @Override
     public void createListView( View view )
     {
-        ImageView image = view.findViewById(com.example.fchataigner.pocket.R.id.thumbnail);
+        ImageView image = view.findViewById(R.id.thumbnail);
 
         try { Picasso.get().load(thumbnail).into(image); }
-        catch( Exception ex ) { image.setImageResource( com.example.fchataigner.pocket.R.drawable.ic_launcher_background ); }
+        catch( Exception ex ) { image.setImageResource( R.drawable.ic_launcher_background ); }
 
-        TextView title_view = view.findViewById(com.example.fchataigner.pocket.R.id.title);
+        TextView title_view = view.findViewById(R.id.title);
         title_view.setText( title );
 
-        TextView author_view = view.findViewById(com.example.fchataigner.pocket.R.id.author);
-        author_view.setText(author);
+        TextView author_view = view.findViewById(R.id.author);
+        author_view.setText( author );
     }
 
     @Override
-    public void createDetailView( View view )
+    public void createDetailsView( View view )
     {
-        ImageView image = (ImageView) view.findViewById(com.example.fchataigner.pocket.R.id.thumbnail);
+        ImageView image = (ImageView) view.findViewById(R.id.thumbnail);
         Picasso.get().load(thumbnail).into(image);
 
-        TextView title_view = (TextView) view.findViewById(com.example.fchataigner.pocket.R.id.title);
+        TextView title_view = (TextView) view.findViewById(R.id.title);
         title_view.setText(title);
 
-        TextView author_view = (TextView) view.findViewById(com.example.fchataigner.pocket.R.id.author);
+        TextView author_view = (TextView) view.findViewById(R.id.author);
         author_view.setText(author);
 
-        TextView ratings = (TextView) view.findViewById(com.example.fchataigner.pocket.R.id.ratings);
+        TextView ratings = (TextView) view.findViewById(R.id.ratings);
         ratings.setText( String.format("rating: %.1f (%d reviews)", averageRating, ratingsCount ) );
 
-        TextView description_view = (TextView) view.findViewById(com.example.fchataigner.pocket.R.id.description);
+        TextView description_view = (TextView) view.findViewById(R.id.description);
         description_view.setText( description );
 
-        TextView publisher_view = (TextView) view.findViewById(com.example.fchataigner.pocket.R.id.publisher);
+        TextView publisher_view = (TextView) view.findViewById(R.id.publisher);
         publisher_view.setText( publisher );
 
-        TextView date_view = (TextView) view.findViewById(com.example.fchataigner.pocket.R.id.date);
+        TextView date_view = (TextView) view.findViewById(R.id.date);
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         try { int year = format.parse(date).getYear(); date_view.setText( year ); }
         catch( Exception ex ) { date_view.setText(date); }
@@ -94,6 +92,15 @@ public class Book implements Parcelable, JSONable, Adaptable
         //link_view.setOnClickListener(this);
     }
 
+    @Override
+    public Book buildFromJSON( JSONObject json ) throws JSONException
+    {
+        Book book = new Book();
+        book.readJSON(json);
+        return book;
+    }
+
+    @Override
     public void readJSON( JSONObject json ) throws JSONException
     {
         this.title = json.getString("title");
@@ -110,6 +117,7 @@ public class Book implements Parcelable, JSONable, Adaptable
         this.date = json.getString("date");
     }
 
+    @Override
     public JSONObject writeJSON() throws JSONException
     {
         JSONObject json = new JSONObject();
@@ -196,22 +204,37 @@ public class Book implements Parcelable, JSONable, Adaptable
         catch( Exception ex )
         {
             book.thumbnail = "";
-            Log.w( "Book", "book=" + book.title + " has no thumbnail" );
+            //Log.w( "Book", "book=" + book.title + " has no thumbnail" );
         }
 
         try
         {
             book.averageRating = volumeInfo.getDouble("averageRating");
             book.ratingsCount = volumeInfo.getInt("ratingsCount");
-            Log.w( "Book", "book=" + book.title + " has no ratings" );
         }
         catch( Exception ex )
         {
+            //Log.w( "Book", "book=" + book.title + " has no ratings" );
             book.averageRating = 0.0;
             book.ratingsCount = 0;
         }
 
         return book;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        final Book book = (Book) obj;
+        return book != null && book.isbn_10.equals(this.isbn_10);
+    }
+
+    @Override
+    public int compareTo( Book book )
+    {
+        if ( this.ratingsCount < book.ratingsCount ) return 1;
+        else if ( this.ratingsCount == book.ratingsCount ) return 0;
+        return -1;
     }
 
     public static final Parcelable.Creator<Book> CREATOR = new Parcelable.Creator<Book>()

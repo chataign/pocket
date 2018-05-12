@@ -144,6 +144,6 @@ public class BookFinder extends AsyncTask< Bitmap, Void, ArrayList<Book> >
 
     protected void onPostExecute( ArrayList<Book> books )
     {
-        bookList.setAdapter( new ItemAdapter<Book>( context, books ) );
+        bookList.setAdapter( new ItemAdapter<Book>( context, books, R.layout.book_item ) );
     }
 }

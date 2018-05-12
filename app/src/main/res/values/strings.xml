@@ -7,11 +7,13 @@
     <string name="books_file">pocket_books.json</string>
     <string name="places_file">pocket_places.json</string>
     <string name="google_api_key">AIzaSyCWlKWcaacfy6xAyetqP2l3XmVTai4Cfhc</string>
+    <string name="google_places_key">AIzaSyC_eSCRb1xiOcvAaX07NpQOZo3jlER7B5I</string>
     <string name="category_books">Books</string>
     <string name="category_events">Events</string>
     <string name="item_food">Restaurants</string>
     <string name="category_shops">Shops</string>
     <string name="item_deleted">Item deleted</string>
+    <string name="duplicate_item">Duplicate item</string>
     <string name="bundle_item">item</string>
     <string name="undo">Undo</string>
 </resources>

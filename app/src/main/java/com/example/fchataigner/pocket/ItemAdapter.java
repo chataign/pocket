@@ -11,20 +11,21 @@ import android.widget.ArrayAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemAdapter<Item extends Adaptable> extends ArrayAdapter<Item>
+public class ItemAdapter<Item extends Displayable> extends ArrayAdapter<Item>
 {
     private Context context;
-    private List<Item> items = new ArrayList<>();
+    private List<Item> items;
+    private int layout_resource;
 
-    public ItemAdapter(@NonNull Context context, ArrayList<Item> items )
+    public ItemAdapter(@NonNull Context context, @NonNull ArrayList<Item> items, int layout_resource )
     {
         super( context, 0 , items );
 
         this.context = context;
         this.items = items;
+        this.layout_resource = layout_resource;
      }
 
-    @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
     {
@@ -32,7 +33,7 @@ public class ItemAdapter<Item extends Adaptable> extends ArrayAdapter<Item>
         View view = convertView;
 
         if(view == null)
-            view = LayoutInflater.from(context).inflate( item.listLayout(),parent,false);
+            view = LayoutInflater.from(context).inflate( layout_resource, parent,false);
 
         item.createListView(view);
         return view;

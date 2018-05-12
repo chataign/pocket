@@ -3,15 +3,18 @@ package com.example.fchataigner.pocket;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class AddBookActivity extends Activity
         implements ListView.OnItemClickListener,
+        TextView.OnEditorActionListener,
         FindBook.OnBookResultsListener
 {
     private ArrayList<Book> books;
@@ -20,18 +23,21 @@ public class AddBookActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(com.example.fchataigner.pocket.R.layout.add_book_activity);
+        setContentView(R.layout.add_book_activity);
+
+        final TextView text_view = findViewById( R.id.search_text );
+        text_view.setOnEditorActionListener(this);
     }
 
-    public void onAddItemClicked(View view)
+    @Override
+    public boolean onEditorAction(TextView view, int actionId, KeyEvent event)
     {
-        TextView text_view = findViewById( com.example.fchataigner.pocket.R.id.search_text );
-
-        String search_text = text_view.getText().toString();
+        String search_text = view.getText().toString();
         String[] search_strings = search_text.split(" ");
 
         FindBook bookFinder = new FindBook(this.getApplicationContext(), this);
         bookFinder.execute(search_strings);
+        return true;
     }
 
     @Override
@@ -40,7 +46,8 @@ public class AddBookActivity extends Activity
         Book book = (Book) list.getItemAtPosition(position);
 
         Intent intent = new Intent();
-        intent.putExtra("book", book );
+        String bundle_item = getApplicationContext().getString(R.string.bundle_item);
+        intent.putExtra( bundle_item, book );
 
         setResult( Activity.RESULT_OK, intent );
         finish();
@@ -49,12 +56,13 @@ public class AddBookActivity extends Activity
     public void onBookResults( ArrayList<Book> books )
     {
         this.books = books;
+        Collections.sort(this.books);
 
-        TextView text = findViewById(com.example.fchataigner.pocket.R.id.text);
-        text.setText( String.format("Found %d results", books.size() ) );
+        TextView search_info = findViewById(R.id.search_info);
+        search_info.setText( String.format("Found %d results", books.size() ) );
 
-        ListView results = findViewById(com.example.fchataigner.pocket.R.id.search_results);
-        results.setAdapter( new ItemAdapter<Book>( this.getApplicationContext(), this.books ) );
+        ListView results = findViewById(R.id.search_results);
+        results.setAdapter( new ItemAdapter<Book>( this.getApplicationContext(), this.books, R.layout.book_item ) );
         results.setOnItemClickListener(this);
     }
 }

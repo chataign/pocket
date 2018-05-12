@@ -1,6 +1,7 @@
 package com.example.fchataigner.pocket;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -17,6 +18,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
         implements Response.ErrorListener, Response.Listener<JSONObject>
@@ -31,20 +34,20 @@ public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
     ArrayList<Place> places = new ArrayList<Place>();
     String baseUrl, apiKey;
     int requestsPending=0;
-    final double latitude, longitude, search_radius;
+    final Location location;
+    final int search_radius;
     final String type;
 
     public FindPlace(Context context, @NonNull OnPlaceResultsListener listener,
-                    double latitude, double longitude, double search_radius, String type )
+                     @NonNull Location location, int search_radius, String type )
     {
         this.listener = listener;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.type = type;
+        this.location = location;
         this.search_radius = search_radius;
+        this.type = type;
         this.requestQueue = Volley.newRequestQueue(context);
         this.baseUrl = context.getString(com.example.fchataigner.pocket.R.string.places_api_url);
-        this.apiKey = context.getString(com.example.fchataigner.pocket.R.string.google_api_key);
+        this.apiKey = context.getString(com.example.fchataigner.pocket.R.string.google_places_key);
     }
 
     @Override
@@ -59,7 +62,15 @@ public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
             for ( int i=0; i< results.length(); ++i )
             {
                 JSONObject json = results.getJSONObject(i);
-                places.add( Place.fromGoogleJSON(json) );
+                Place place = Place.fromGoogleJSON(json);
+
+                Location place_location = new Location(place.id);
+
+                place_location.setLatitude(place.latitude);
+                place_location.setLongitude(place.longitude);
+
+                if ( place_location.distanceTo(location) < search_radius )
+                    places.add( place );
             }
 
             Log.i( "FindPlace", "results=" + results.length() );
@@ -77,17 +88,47 @@ public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
         //this.cancel(true);
     }
 
+    class SortByDistance implements Comparator<Place>
+    {
+        private final Location location;
+
+        SortByDistance( @NonNull Location location )
+        {
+            this.location = location;
+        }
+
+        public int compare(Place place1, Place place2 )
+        {
+            Location l1 = new Location("place1");
+            Location l2 = new Location("place2");
+
+            l1.setLatitude(place1.latitude);
+            l1.setLongitude(place1.longitude);
+
+            l2.setLatitude(place2.latitude);
+            l2.setLongitude(place2.longitude);
+
+            double d1 = location.distanceTo(l1);
+            double d2 = location.distanceTo(l2);
+
+            if ( d1 < d2 ) return 1;
+            if ( d1 == d2 ) return 0;
+            return -1;
+        }
+    }
+
     protected ArrayList<Place> doInBackground( String... search_strings )
     {
         places.clear();
 
         String queryUrl = baseUrl;
-        queryUrl += "location=" + latitude + "," + longitude;
-        queryUrl += "&radius=" + search_radius;
-        queryUrl += "&type=" + type;
+        queryUrl += "location=" + location.getLatitude() + "," + location.getLongitude();
+        queryUrl += "&rankby=distance";
+        //queryUrl += "&radius=" + search_radius;
         queryUrl += "&key=" + apiKey;
-
-        //for ( String str : search_strings ) queryUrl += "+" + str;
+        //queryUrl += "&type=" + type;
+        queryUrl += "&keyword=" + type;
+        for ( String str : search_strings ) queryUrl += "+" + str;
 
         Log.i("FindPlace", "url=" + queryUrl);
 
@@ -104,5 +145,10 @@ public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
     }
 
     protected void onPreExecute() {}
-    protected void onPostExecute( ArrayList<Place> places ) { listener.onPlaceResults(places); }
+
+    protected void onPostExecute( ArrayList<Place> places )
+    {
+        Collections.sort(places, new SortByDistance(location) );
+        listener.onPlaceResults(places);
+    }
 }
