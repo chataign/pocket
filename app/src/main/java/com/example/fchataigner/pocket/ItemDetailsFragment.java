@@ -7,9 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class ItemDetailsFragment<Item extends Displayable> 
-        extends Fragment
-        implements Button.OnClickListener
+public class ItemDetailsFragment<Item extends Displayable> extends Fragment
 {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -19,20 +17,8 @@ public class ItemDetailsFragment<Item extends Displayable>
         Item item = (Item) args.getParcelable(bundle_item);
 
         View view = inflater.inflate( item.getDetailsLayout(), container, false);
-        item.createDetailsView(view);
+        item.createDetailsView( getContext(), view );
 
         return view;
-    }
-
-    @Override
-    public void onClick(View v)
-    {
-        /*
-        if ( item != null )
-        {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.link) );
-            startActivity(intent);
-        }
-        */
     }
 }

@@ -11,7 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:padding="5dp" />
+        android:padding="5dp"
+        android:paddingRight="10dp"/>
 
     <TextView
         android:id="@+id/name"
@@ -19,10 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/icon"
         android:layout_toRightOf="@id/icon"
-        android:padding="5dp"
-        android:textColor="@android:color/black"
-        android:textSize="10pt"
-        android:textStyle="bold" />
+        android:theme="@style/TitleText" />
 
     <TextView
         android:id="@+id/vicinity"
@@ -30,9 +28,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/name"
         android:layout_toRightOf="@id/icon"
-        android:padding="5dp"
-        android:textColor="@android:color/black"
-        android:textSize="8pt"
-        android:textStyle="italic" />
+        android:theme="@style/SubtitleText" />
 
 </RelativeLayout>

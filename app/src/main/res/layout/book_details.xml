@@ -5,91 +5,74 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<RelativeLayout
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:padding="15dp"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/thumbnail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="5dp" />
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/TitleText" />
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/thumbnail"
-        android:layout_toRightOf="@id/thumbnail"
-        android:textColor="@android:color/black"
-        android:textSize="12pt"
-        android:textStyle="bold"
-        android:padding="5dp" />
+        <TextView
+            android:id="@+id/author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title"
+            android:theme="@style/SubtitleText" />
 
-    <TextView
-        android:id="@+id/author"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/thumbnail"
-        android:layout_below="@id/title"
-        android:textColor="@android:color/black"
-        android:textSize="10pt"
-        android:textStyle="italic"
-        android:padding="5dp" />
+        <TextView
+            android:id="@+id/ratings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/author"
+            android:theme="@style/NormalText" />
 
-    <TextView
-        android:id="@+id/publisher"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/thumbnail"
-        android:layout_below="@id/author"
-        android:textColor="@android:color/black"
-        android:textSize="8pt" />
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ratings"
+            android:theme="@style/NormalText" />
 
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/thumbnail"
-        android:layout_below="@id/publisher"
-        android:textColor="@android:color/black"
-        android:textSize="8pt" />
+        <TextView
+            android:id="@+id/publisher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/date"
+            android:theme="@style/NormalText" />
+
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/title"
+            android:layout_alignParentRight="true"
+            android:padding="5dp" />
 
     </RelativeLayout>
 
     <Button
-        android:id="@+id/link"
+        android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/header"
-        android:autoLink="web"
-        android:onClick="openBookLink"
-        android:text="open in Google Play" />
-
-    <TextView
-        android:id="@+id/ratings"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/link"
-        android:textColor="@android:color/black"
-        android:textSize="8pt"
-        android:textStyle="italic" />
+        android:theme="@style/LinkButton"
+        android:text="open in Google Play"/>
 
     <TextView
         android:id="@+id/description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ratings"
-        android:padding="5dp"
-        android:textColor="@android:color/black"
-        android:textSize="8pt" />
+        android:theme="@style/NormalText" />
 
-</RelativeLayout>
+</LinearLayout>
 
 </ScrollView>

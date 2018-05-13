@@ -29,7 +29,7 @@ public class ItemListFragment<Item extends Displayable & JSONable & Parcelable>
     public final int REQUEST_ADD_ITEM = 1;
 
     private ArrayList<Item> items = new ArrayList<Item>();
-    private ItemAdapter<Item> adapter = null;
+    private ItemListAdapter<Item> adapter = null;
     private int deleted_position;
     private Item deleted_item=null;
     private Item base_item=null;
@@ -74,7 +74,7 @@ public class ItemListFragment<Item extends Displayable & JSONable & Parcelable>
 
         ListView list = (ListView) getView().findViewById(R.id.list);
 
-        adapter = new ItemAdapter<Item>( getContext(), items, base_item.getItemLayout() );
+        adapter = new ItemListAdapter<Item>( getContext(), items, base_item.getItemLayout() );
         list.setAdapter( adapter );
         list.setOnItemClickListener(this);
         list.setOnItemLongClickListener(this);
@@ -132,7 +132,7 @@ public class ItemListFragment<Item extends Displayable & JSONable & Parcelable>
                 }
                 else
                 {
-                    items.add( new_item );
+                    items.add( 0, new_item ); // add to top of the list
                 }
             }
             catch( Exception ex )

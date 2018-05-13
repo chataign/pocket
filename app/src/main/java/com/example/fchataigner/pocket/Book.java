@@ -1,9 +1,13 @@
 package com.example.fchataigner.pocket;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,10 +19,14 @@ import org.json.JSONObject;
 
 import java.lang.Cloneable;
 import java.text.DateFormat;
+import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Locale;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
-public class Book implements Parcelable, JSONable, Comparable<Book>, Displayable, Cloneable
+public class Book implements Parcelable, JSONable, Displayable, Cloneable
 {
     public String isbn_13;
     public String isbn_10;
@@ -47,13 +55,35 @@ public class Book implements Parcelable, JSONable, Comparable<Book>, Displayable
     @Override
     public Class<?> getAddItemClass() { return AddBookActivity.class; }
 
+    String getMonth() throws ParseException
+    {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime( format.parse(date) );
+        int month = calendar.get(Calendar.MONTH);
+        String[] months = new DateFormatSymbols().getMonths();
+        return months[month];
+    }
+
+    int getYear() throws ParseException
+    {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime( format.parse(date) );
+        return calendar.get(Calendar.YEAR);
+    }
+
     @Override
     public void createListView( View view )
     {
-        ImageView image = view.findViewById(R.id.thumbnail);
+        ImageView image_view = view.findViewById(R.id.thumbnail);
 
-        try { Picasso.get().load(thumbnail).into(image); }
-        catch( Exception ex ) { image.setImageResource( R.drawable.ic_launcher_background ); }
+        Picasso.get()
+                .load(thumbnail)
+                .error( R.drawable.ic_launcher_background )
+                .resize(150, 200)
+                .centerCrop()
+                .into(image_view);
 
         TextView title_view = view.findViewById(R.id.title);
         title_view.setText( title );
@@ -63,10 +93,15 @@ public class Book implements Parcelable, JSONable, Comparable<Book>, Displayable
     }
 
     @Override
-    public void createDetailsView( View view )
+    public void createDetailsView( final Context context, View view )
     {
-        ImageView image = (ImageView) view.findViewById(R.id.thumbnail);
-        Picasso.get().load(thumbnail).into(image);
+        ImageView image_view = (ImageView) view.findViewById(R.id.thumbnail);
+
+        Picasso.get()
+                .load(thumbnail)
+                .resize(225, 300)
+                .centerCrop()
+                .into(image_view);
 
         TextView title_view = (TextView) view.findViewById(R.id.title);
         title_view.setText(title);
@@ -75,7 +110,7 @@ public class Book implements Parcelable, JSONable, Comparable<Book>, Displayable
         author_view.setText(author);
 
         TextView ratings = (TextView) view.findViewById(R.id.ratings);
-        ratings.setText( String.format("rating: %.1f (%d reviews)", averageRating, ratingsCount ) );
+        ratings.setText( String.format("%.1f (from %d reviews)", averageRating, ratingsCount ) );
 
         TextView description_view = (TextView) view.findViewById(R.id.description);
         description_view.setText( description );
@@ -84,12 +119,27 @@ public class Book implements Parcelable, JSONable, Comparable<Book>, Displayable
         publisher_view.setText( publisher );
 
         TextView date_view = (TextView) view.findViewById(R.id.date);
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-        try { int year = format.parse(date).getYear(); date_view.setText( year ); }
-        catch( Exception ex ) { date_view.setText(date); }
 
-        //Button link_view = (Button) view.findViewById(R.id.link);
-        //link_view.setOnClickListener(this);
+        try
+        {
+            date_view.setText( String.format("%s %d", getMonth(), getYear() ) );
+        }
+        catch( ParseException ex )
+        {
+            date_view.setText(date);
+            Log.w( "Book", "failed to parse date, error=" + ex.getMessage() );
+        }
+
+        Button button = (Button) view.findViewById(R.id.button);
+        button.setOnClickListener( new Button.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link) );
+                context.startActivity(intent);
+            }
+        } );
     }
 
     @Override
@@ -204,7 +254,6 @@ public class Book implements Parcelable, JSONable, Comparable<Book>, Displayable
         catch( Exception ex )
         {
             book.thumbnail = "";
-            //Log.w( "Book", "book=" + book.title + " has no thumbnail" );
         }
 
         try
@@ -214,7 +263,6 @@ public class Book implements Parcelable, JSONable, Comparable<Book>, Displayable
         }
         catch( Exception ex )
         {
-            //Log.w( "Book", "book=" + book.title + " has no ratings" );
             book.averageRating = 0.0;
             book.ratingsCount = 0;
         }
@@ -227,14 +275,6 @@ public class Book implements Parcelable, JSONable, Comparable<Book>, Displayable
     {
         final Book book = (Book) obj;
         return book != null && book.isbn_10.equals(this.isbn_10);
-    }
-
-    @Override
-    public int compareTo( Book book )
-    {
-        if ( this.ratingsCount < book.ratingsCount ) return 1;
-        else if ( this.ratingsCount == book.ratingsCount ) return 0;
-        return -1;
     }
 
     public static final Parcelable.Creator<Book> CREATOR = new Parcelable.Creator<Book>()

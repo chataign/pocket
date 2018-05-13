@@ -64,7 +64,7 @@ public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
                 JSONObject json = results.getJSONObject(i);
                 Place place = Place.fromGoogleJSON(json);
 
-                Location place_location = new Location(place.id);
+                Location place_location = new Location(place.place_id);
 
                 place_location.setLatitude(place.latitude);
                 place_location.setLongitude(place.longitude);

@@ -2,7 +2,6 @@ package com.example.fchataigner.pocket;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,20 +15,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
-import com.google.android.gms.vision.text.Line;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -145,10 +138,10 @@ public class AddPlaceActivity extends AppCompatActivity
     @Override
     public void onItemClick( AdapterView<?> list, View view, int position, long id )
     {
-        Log.i( "AddPlace", "onItemClick");
+        Place place = (Place) list.getItemAtPosition(position);
+        Log.i( "AddPlace", "adding place id=" + place.place_id );
 
         Intent intent = new Intent();
-        Place place = (Place) list.getItemAtPosition(position);
         String bundle_item = getApplicationContext().getString(R.string.bundle_item);
         intent.putExtra(bundle_item, place );
 
@@ -160,15 +153,14 @@ public class AddPlaceActivity extends AppCompatActivity
     {
         Log.i( "AddPlace", "onPlaceResults");
 
-        TextView text_view = findViewById( R.id.search_text );
-        SeekBar search_radius = findViewById(R.id.search_radius);
+        final SeekBar search_radius = findViewById(R.id.search_radius);
+        final TextView info_view = findViewById(R.id.search_info);
 
-        TextView text = findViewById(R.id.search_info);
-        text.setText( String.format("Found %d results (search radius: %dm)",
+        info_view.setText( String.format("Found %d results (search radius: %dm)",
                 places.size(), search_radius.getProgress() ) );
 
         ListView results = findViewById(R.id.search_results);
-        results.setAdapter( new ItemAdapter<Place>( this.getApplicationContext(), places, R.layout.place_item ) );
+        results.setAdapter( new ItemListAdapter<Place>( this.getApplicationContext(), places, R.layout.place_item ) );
         results.setOnItemClickListener(this);
     }
 }

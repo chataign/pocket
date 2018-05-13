@@ -3,7 +3,7 @@
     <string name="action_settings">Settings</string>
     <string name="book_api_url">https://www.googleapis.com/books/v1/volumes?q=search</string>
     <string name="places_api_url">https://maps.googleapis.com/maps/api/place/nearbysearch/json?</string>
-    <string name="title_activity_additem">Add item</string>
+    <string name="places_details_api_url">https://maps.googleapis.com/maps/api/place/details/json?</string>
     <string name="books_file">pocket_books.json</string>
     <string name="places_file">pocket_places.json</string>
     <string name="google_api_key">AIzaSyCWlKWcaacfy6xAyetqP2l3XmVTai4Cfhc</string>
