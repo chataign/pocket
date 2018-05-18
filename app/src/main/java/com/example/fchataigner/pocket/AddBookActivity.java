@@ -4,92 +4,132 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.google.android.gms.common.api.CommonStatusCodes;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 public class AddBookActivity extends AppCompatActivity
         implements
-        ListView.OnItemClickListener,
         SearchView.OnQueryTextListener,
-        FindBook.OnBookResultsListener
+        FindBook.OnBookResultsListener,
+        ListView.OnItemClickListener
 {
-    private ArrayList<Book> books;
+    static private String TAG = "AddBookActivity";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    protected void onCreate( Bundle savedInstanceState )
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_book_activity);
+
+        setContentView( R.layout.add_book_activity );
         setSupportActionBar( (Toolbar) findViewById(R.id.toolbar) );
 
-        final SearchView search_view = findViewById( R.id.search_view );
+        SearchView search_view = findViewById(R.id.search_view);
+        search_view.setQueryHint( "book title, author" );
         search_view.setOnQueryTextListener(this);
+
+        ArrayList<Language> languages = new ArrayList<>();
+        languages.add( Language.English );
+        languages.add( Language.Spanish );
+        languages.add( Language.French );
+
+        ArrayAdapter<Language> adapter = new ArrayAdapter<Language>( this, R.layout.spinner_item, R.id.spinner_text, languages );
+
+        Spinner language_spinner = findViewById(R.id.language_spinner);
+        language_spinner.setAdapter( adapter );
+
+        final Activity activity = this;
+
+        ImageButton camera_button = findViewById(R.id.camera_button);
+        camera_button.setOnClickListener( new Button.OnClickListener()
+        {
+            @Override
+            public void onClick( View view )
+            {
+                Intent intent = new Intent( activity, OcrCaptureActivity.class );
+                intent.putExtra(OcrCaptureActivity.AutoFocus, true);
+                intent.putExtra(OcrCaptureActivity.UseFlash, false);
+                startActivityForResult( intent, OcrCaptureActivity.GET_TEXT );
+            }
+        } );
     }
 
     @Override
-    public boolean onQueryTextSubmit(String query)
+    public boolean onQueryTextChange( String query )
     {
-        final LinearLayout layout = (LinearLayout)findViewById(R.id.layout);
-        final SearchView search_view = findViewById(R.id.search_view);
-
-        InputMethodManager manager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        manager.hideSoftInputFromWindow( layout.getWindowToken(), 0);
-
-        String search_text = search_view.getQuery().toString();
-        String[] search_strings = search_text.split(" ");
-
-        FindBook bookFinder = new FindBook(this.getApplicationContext(), this);
-        bookFinder.execute(search_strings);
         return true;
     }
 
     @Override
-    public boolean onQueryTextChange(String query) { return true; }
+    public boolean onQueryTextSubmit( String query )
+    {
+        Spinner language_spinner = findViewById(R.id.language_spinner);
+
+        InputMethodManager manager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        manager.hideSoftInputFromWindow( language_spinner.getWindowToken(), 2);
+
+        String[] query_strings = query.split(" ");
+        Language language = (Language) language_spinner.getSelectedItem();
+
+        FindBook book_finder = new FindBook( this, language, this );
+        book_finder.execute(query_strings);
+
+        return true;
+    }
 
     @Override
-    public void onItemClick( AdapterView<?> list, View view, int position, long id )
+    public void onBookResults( @NonNull ArrayList<Book> books )
+    {
+        TextView info_text = findViewById(R.id.info_text);
+        info_text.setText( String.format( "found %d books", books.size() ) );
+
+        Collections.sort( books, Book.OrderByRating );
+
+        ListView results_list = findViewById(R.id.results_list);
+        results_list.setAdapter( new ItemListAdapter( this.getApplicationContext(), books, R.layout.book_item ) );
+        results_list.setOnItemClickListener(this);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> list, View view, int position, long id )
     {
         Book book = (Book) list.getItemAtPosition(position);
 
         Intent intent = new Intent();
-        String bundle_item = getApplicationContext().getString(R.string.bundle_item);
+        String bundle_item = this.getString(R.string.bundle_item);
         intent.putExtra( bundle_item, book );
 
         setResult( Activity.RESULT_OK, intent );
         finish();
     }
 
-    public void onBookResults( ArrayList<Book> books )
+    @Override
+    public void onActivityResult( int request, int result, Intent intent )
     {
-        Comparator<Book> BookComparator = new Comparator<Book>()
+        if ( request == OcrCaptureActivity.GET_TEXT && result == CommonStatusCodes.SUCCESS )
         {
-            public int compare( Book book1, Book book2 )
-            {
-                if ( book1.ratingsCount < book2.ratingsCount ) return 1;
-                else if ( book1.ratingsCount == book2.ratingsCount ) return 0;
-                return -1;
-            }
-        };
+            String query = intent.getStringExtra( OcrCaptureActivity.TextBlockObject );
+            query = query.replaceAll("['\"+\n\t]"," ");
 
-        this.books = books;
-        Collections.sort( this.books, BookComparator );
-
-        TextView search_info = findViewById(R.id.search_info);
-        search_info.setText( String.format("Found %d results", books.size() ) );
-
-        ListView results = findViewById(R.id.search_results);
-        results.setAdapter( new ItemListAdapter<Book>( this.getApplicationContext(), this.books, R.layout.book_item ) );
-        results.setOnItemClickListener(this);
+            SearchView search_view = findViewById(R.id.search_view);
+            search_view.setQuery( query, false );
+            this.onQueryTextSubmit(query);
+        }
     }
 }

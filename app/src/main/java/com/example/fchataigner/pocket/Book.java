@@ -23,10 +23,11 @@ import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class Book implements Parcelable, JSONable, Displayable, Cloneable
+public class Book implements Parcelable, JSONable, Listable, Displayable, Cloneable
 {
     public String isbn_13;
     public String isbn_10;
@@ -48,6 +49,9 @@ public class Book implements Parcelable, JSONable, Displayable, Cloneable
 
     @Override
     public int getItemLayout() { return R.layout.book_item; }
+
+    @Override
+    public int getAddActivityLayout() { return R.layout.add_book_activity; }
 
     @Override
     public int getFileResource() { return R.string.books_file; }
@@ -281,5 +285,15 @@ public class Book implements Parcelable, JSONable, Displayable, Cloneable
     {
         public Book createFromParcel(Parcel parcel) { return new Book(parcel); }
         public Book[] newArray(int size) { return new Book[size]; }
+    };
+
+    public static final Comparator<Book> OrderByRating = new Comparator<Book>()
+    {
+        public int compare( Book book1, Book book2 )
+        {
+            if ( book1.ratingsCount < book2.ratingsCount ) return 1;
+            else if ( book1.ratingsCount == book2.ratingsCount ) return 0;
+            return -1;
+        }
     };
 };

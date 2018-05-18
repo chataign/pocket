@@ -1,7 +1,6 @@
 package com.example.fchataigner.pocket;
 
 import android.content.Context;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -14,15 +13,16 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class GetPlaceDetails extends AsyncTask< Place, Void, PlaceDetails >
         implements Response.ErrorListener, Response.Listener<JSONObject>
 {
+    static private String TAG = "GetPlaceDetails";
+
     public interface OnDetailsReceived
     {
-        public void onDetailsReceived( PlaceDetails details );
+        void onDetailsReceived( PlaceDetails details );
     }
 
     OnDetailsReceived listener;
@@ -31,7 +31,7 @@ public class GetPlaceDetails extends AsyncTask< Place, Void, PlaceDetails >
     int requests_pending=0;
     PlaceDetails details=null;
 
-    public GetPlaceDetails(Context context, @NonNull OnDetailsReceived listener )
+    public GetPlaceDetails( @NonNull Context context, @NonNull OnDetailsReceived listener )
     {
         this.listener = listener;
         this.request_queue = Volley.newRequestQueue(context);
@@ -44,20 +44,14 @@ public class GetPlaceDetails extends AsyncTask< Place, Void, PlaceDetails >
     {
         requests_pending--;
 
-        try
-        {
-            details = PlaceDetails.fromGoogleJSON( response.getJSONObject("result") );
-        }
-        catch( Exception ex )
-        {
-            Log.e( "FindPlace", ex.getMessage() ); return;
-        }
+        try { details = PlaceDetails.fromGoogleJSON( response.getJSONObject("result") ); }
+        catch( Exception ex ) { Log.e( TAG, ex.getMessage() ); }
     }
 
     @Override
     public void onErrorResponse( VolleyError error )
     {
-        Log.e( "GetPlaceDetails", "VolleyError=" + error.toString() );
+        Log.e( TAG, "VolleyError=" + error.toString() );
         //this.cancel(true);
     }
 
@@ -66,12 +60,12 @@ public class GetPlaceDetails extends AsyncTask< Place, Void, PlaceDetails >
         details = null;
 
         if ( places.length == 0 )
-                return null;
+            return null;
 
         Place place = places[0];
 
         String query_url = base_url + "key=" + api_key + "&placeid=" + place.place_id;
-        Log.i("GetPlaceDetails", "url=" + query_url);
+        Log.i(TAG, "url=" + query_url);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, query_url,
                 null, this, this);

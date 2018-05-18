@@ -6,9 +6,11 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.method.LinkMovementMethod;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 
-public class Place implements Parcelable, JSONable, Displayable, Cloneable
+public class Place implements Parcelable, JSONable, Listable, Displayable, Cloneable
 {
     public String place_id;
     public String name;
@@ -50,6 +52,9 @@ public class Place implements Parcelable, JSONable, Displayable, Cloneable
     public int getItemLayout() { return R.layout.place_item; }
 
     @Override
+    public int getAddActivityLayout() { return R.layout.add_place_activity; }
+
+    @Override
     public int getFileResource() { return R.string.places_file; }
 
     @Override
@@ -60,8 +65,12 @@ public class Place implements Parcelable, JSONable, Displayable, Cloneable
     {
         ImageView image_view = view.findViewById(R.id.icon);
 
-        try { Picasso.get().load(icon).into(image_view); }
-        catch( Exception ex ) { image_view.setImageResource( R.drawable.ic_launcher_background ); }
+        Picasso.get()
+                .load(icon)
+                .error( R.drawable.ic_launcher_background )
+                .resize(100, 100)
+                .centerCrop()
+                .into(image_view);
 
         TextView name_field = view.findViewById(R.id.name);
         name_field.setText( name );
@@ -73,8 +82,14 @@ public class Place implements Parcelable, JSONable, Displayable, Cloneable
     @Override
     public void createDetailsView( final Context context, final View view )
     {
-        ImageView image = (ImageView) view.findViewById(R.id.icon);
-        Picasso.get().load(icon).into(image);
+        ImageView image_view = (ImageView) view.findViewById(R.id.icon);
+
+        Picasso.get()
+                .load(icon)
+                .error( R.drawable.ic_launcher_background )
+                .resize(100, 100)
+                .centerCrop()
+                .into(image_view);
 
         TextView name_view = (TextView) view.findViewById(R.id.name);
         name_view.setText(name);
@@ -118,8 +133,15 @@ public class Place implements Parcelable, JSONable, Displayable, Cloneable
                 TextView reviews_header = view.findViewById(R.id.reviews_header);
                 reviews_header.setText( String.format( "%d reviews", details.reviews.size() ) );
 
-                ListView reviews_list = view.findViewById(R.id.reviews);
-                reviews_list.setAdapter( new ReviewAdapter( context, details.reviews ) );
+                LinearLayout reviews_layout = (LinearLayout) view.findViewById(R.id.reviews);
+                LayoutInflater inflater = LayoutInflater.from(context);
+
+                for ( Review review : details.reviews)
+                {
+                    View item_view = inflater.inflate(R.layout.review_item, reviews_layout, false);
+                    review.populateView(item_view);
+                    reviews_layout.addView(item_view);
+                }
             }
         };
 
@@ -224,12 +246,6 @@ public class Place implements Parcelable, JSONable, Displayable, Cloneable
         public Place createFromParcel(Parcel parcel) { return new Place(parcel); }
         public Place[] newArray(int size) { return new Place[size]; }
     };
-
-    public boolean hasType( String search_type )
-    {
-        for ( String type : types ) if ( type.equals(search_type) ) return true;
-        return false;
-    }
 
     @Override
     public boolean equals(Object obj)

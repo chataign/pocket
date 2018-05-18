@@ -18,7 +18,6 @@ public class MainActivity extends AppCompatActivity
         String title="";
 
         Bundle args = new Bundle();
-
         String bundle_item = getApplicationContext().getString(R.string.bundle_item);
 
         switch( item_id )

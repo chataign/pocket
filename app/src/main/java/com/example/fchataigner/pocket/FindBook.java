@@ -21,23 +21,29 @@ import java.util.ArrayList;
 public class FindBook extends AsyncTask< String, Void, ArrayList<Book> >
         implements Response.ErrorListener, Response.Listener<JSONObject>
 {
+    private static String TAG = "FindBook";
+
     public interface OnBookResultsListener
     {
         public void onBookResults( ArrayList<Book> books );
     }
 
+    Language language;
     OnBookResultsListener listener;
     RequestQueue requestQueue;
     ArrayList<Book> books;
-    String baseUrl;
+    String base_url;
     int requestsPending;
 
-    public FindBook( Context context, @NonNull OnBookResultsListener listener )
+    public FindBook( @NonNull Context context,
+                     @NonNull Language language,
+                     @NonNull OnBookResultsListener listener )
     {
         this.listener = listener;
+        this.language = language;
         books = new ArrayList<Book>();
         requestQueue = Volley.newRequestQueue(context);
-        baseUrl = context.getString(com.example.fchataigner.pocket.R.string.book_api_url);
+        base_url = context.getString(com.example.fchataigner.pocket.R.string.book_api_url);
         requestsPending=0;
     }
 
@@ -45,24 +51,36 @@ public class FindBook extends AsyncTask< String, Void, ArrayList<Book> >
     public void onResponse( JSONObject response )
     {
         requestsPending--;
-        JSONArray items;
+        JSONArray json_items;
 
-        try { items = response.getJSONArray("items"); }
+        try { json_items = response.getJSONArray("items"); }
         catch( Exception ex ) { Log.e( "onResponse", ex.getMessage() ); return; }
 
-        Log.i( "FindBook.onResponse", "results=" + items.length() );
+        Log.i( TAG, "results=" + json_items.length() );
 
-        for ( int i=0; i< items.length(); ++i )
+        for ( int i=0; i< json_items.length(); ++i )
         {
-            try { JSONObject json = items.getJSONObject(i); books.add( Book.fromGoogleJSON(json) ); }
-            catch( Exception ex ) { Log.w( "FindBook.onResponse", ex.getMessage() ); }
+            try
+            {
+                JSONObject json = json_items.getJSONObject(i);
+                Book book = Book.fromGoogleJSON(json);
+
+                if ( book.language.equals(this.language.code) == false )
+                    continue;
+
+                books.add( book );
+            }
+            catch( Exception ex )
+            {
+                Log.w( "FindBook.onResponse", ex.getMessage() );
+            }
         }
     }
 
     @Override
     public void onErrorResponse( VolleyError error )
     {
-        Log.e( "VolleyError", error.toString() );
+        Log.e( TAG, "VolleyError=" + error.toString() );
         //this.cancel(true);
     }
 
@@ -70,13 +88,16 @@ public class FindBook extends AsyncTask< String, Void, ArrayList<Book> >
     {
         books.clear();
 
-        String queryUrl = baseUrl;
-        for ( String str : search_strings ) queryUrl += "+" + str;
+        String query_url = base_url;
+        for ( String str : search_strings ) query_url += "+" + str;
 
-        queryUrl += "&printType=books&maxResults=40&langRestrict=en";
-        Log.i("url", queryUrl);
+        query_url += "&printType=books";
+        query_url += "&maxResults=40";
+        query_url += "&langRestrict=" + language.code;
+        
+        Log.i(TAG, query_url);
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, queryUrl,
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, query_url,
                 null, this, this);
 
         requestsPending++;

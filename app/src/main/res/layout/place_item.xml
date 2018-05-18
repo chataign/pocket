@@ -4,14 +4,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="80dp">
+    android:padding="5dp">
 
     <ImageView
         android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:padding="5dp"
         android:paddingRight="10dp"/>
 
     <TextView
@@ -20,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/icon"
         android:layout_toRightOf="@id/icon"
-        android:theme="@style/TitleText" />
+        android:theme="@style/ListItemTitle" />
 
     <TextView
         android:id="@+id/vicinity"
@@ -28,6 +27,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/name"
         android:layout_toRightOf="@id/icon"
-        android:theme="@style/SubtitleText" />
+        android:theme="@style/ListItemSubtitle" />
 
 </RelativeLayout>

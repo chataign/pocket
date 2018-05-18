@@ -8,7 +8,7 @@
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="15dp"
+    android:padding="10dp"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -16,10 +16,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="10dp"/>
+
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignTop="@id/thumbnail"
+            android:layout_toRightOf="@id/thumbnail"
             android:theme="@style/TitleText" />
 
         <TextView
@@ -27,6 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/title"
+            android:layout_toRightOf="@id/thumbnail"
             android:theme="@style/SubtitleText" />
 
         <TextView
@@ -34,6 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/author"
+            android:layout_toRightOf="@id/thumbnail"
             android:theme="@style/NormalText" />
 
         <TextView
@@ -41,6 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/ratings"
+            android:layout_toRightOf="@id/thumbnail"
             android:theme="@style/NormalText" />
 
         <TextView
@@ -48,15 +59,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/date"
+            android:layout_toRightOf="@id/thumbnail"
             android:theme="@style/NormalText" />
-
-        <ImageView
-            android:id="@+id/thumbnail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/title"
-            android:layout_alignParentRight="true"
-            android:padding="5dp" />
 
     </RelativeLayout>
 

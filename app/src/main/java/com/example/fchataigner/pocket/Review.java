@@ -1,5 +1,8 @@
 package com.example.fchataigner.pocket;
 
+import android.view.View;
+import android.widget.TextView;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,6 +29,18 @@ public class Review
         review.text = json.getString("text");
         review.time = json.getString("time");
         return review;
+    }
+
+    public void populateView( View view )
+    {
+        TextView author_view = view.findViewById(R.id.author_name);
+        author_view.setText( author_name );
+
+        TextView time_view = view.findViewById(R.id.relative_time);
+        time_view.setText( relative_time );
+
+        TextView text_view = view.findViewById(R.id.text);
+        text_view.setText( text );
     }
 }
 

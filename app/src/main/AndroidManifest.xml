@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -33,19 +34,9 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".FindBookActivity"
-            android:label="Find Book"
-            android:theme="@style/AppTheme.NoActionBar" />
-
-        <activity
-            android:name=".AddBookActivity"
-            android:label="Add Book"
-            android:theme="@style/AppTheme.NoActionBar" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -58,14 +49,21 @@
         </provider>
 
         <activity
+            android:name=".AddBookActivity"
+            android:label="Add new book"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
             android:name=".AddPlaceActivity"
-            android:label="@string/title_activity_additem"
-            android:parentActivityName=".MainActivity"
+            android:label="Add new place"
             android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.fchataigner.pocket.MainActivity" />
         </activity>
+
+        <activity
+            android:name=".OcrCaptureActivity"
+            android:label="OCR Capture"
+            android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>

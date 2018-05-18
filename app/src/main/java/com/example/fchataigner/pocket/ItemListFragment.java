@@ -14,19 +14,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-
 import org.json.JSONArray;
 import java.util.ArrayList;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 
-public class ItemListFragment<Item extends Displayable & JSONable & Parcelable>
+public class ItemListFragment<Item extends Listable & Displayable & JSONable & Parcelable>
         extends Fragment
         implements
         ListView.OnItemClickListener,
         ListView.OnItemLongClickListener
 {
     public final int REQUEST_ADD_ITEM = 1;
+    public final String TAG = "ItemListFragment";
 
     private ArrayList<Item> items = new ArrayList<Item>();
     private ItemListAdapter<Item> adapter = null;
@@ -39,8 +39,6 @@ public class ItemListFragment<Item extends Displayable & JSONable & Parcelable>
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.i("Items", "ItemListFragment::onCreateView" );
-
         try
         {
             Bundle args = getArguments();
@@ -55,11 +53,11 @@ public class ItemListFragment<Item extends Displayable & JSONable & Parcelable>
             for ( int i=0; i< json.length(); ++i )
                 items.add( (Item) base_item.buildFromJSON( json.getJSONObject(i) ) );
 
-            Log.i( "Items", String.format( "read %d items from file=", items.size(), items_file ) );
+            Log.i( TAG, String.format( "read %d items from file=", items.size(), items_file ) );
         }
         catch( Exception ex )
         {
-            Log.w( "Items", String.format( "failed to read file, error=%s", ex.getMessage() ) );
+            Log.w( TAG, String.format( "failed to read file, error=%s", ex.getMessage() ) );
             items = new ArrayList<Item>();
         }
 
@@ -70,7 +68,6 @@ public class ItemListFragment<Item extends Displayable & JSONable & Parcelable>
     public void onStart()
     {
         super.onStart();
-        Log.i("Items", "ItemListFragment::onStart" );
 
         ListView list = (ListView) getView().findViewById(R.id.list);
 
@@ -85,7 +82,9 @@ public class ItemListFragment<Item extends Displayable & JSONable & Parcelable>
             @Override
             public void onClick(View view)
             {
+                String bundle_item = getContext().getString(R.string.bundle_item);
                 Intent intent = new Intent( getActivity(), base_item.getAddItemClass() );
+                intent.putExtra( bundle_item, base_item );
                 startActivityForResult( intent, REQUEST_ADD_ITEM );
             }
         });
@@ -95,16 +94,16 @@ public class ItemListFragment<Item extends Displayable & JSONable & Parcelable>
     public void onStop()
     {
         Log.i("Items", "ItemListFragment::onStop" );
-        String items_file = getContext().getString( base_item.getFileResource() );
 
         try
         {
+            String items_file = getContext().getString( base_item.getFileResource() );
             Utils.writeJSONFile( items, getContext(), items_file );
             Log.i( "Items", String.format( "saved %d items to file=%s", items.size(), items_file ) );
         }
         catch( Exception ex )
         {
-            Log.e( "Items", "failed to save items to file=" + items_file );
+            Log.e( "Items", "failed to save items to file" );
         }
 
         super.onStop();
@@ -119,21 +118,15 @@ public class ItemListFragment<Item extends Displayable & JSONable & Parcelable>
             {
                 String bundle_item = getContext().getString(R.string.bundle_item);
                 Bundle bundle = intent.getExtras();
-                Item new_item = (Item) bundle.getParcelable(bundle_item);
+                Item new_item = bundle.getParcelable(bundle_item);
 
                 boolean item_exists=false;
 
                 for ( Item item : items )
                     if ( new_item.equals(item) ) { item_exists=true; break; }
 
-                if ( item_exists )
-                {
-                    Snackbar.make( getView(), R.string.duplicate_item, Snackbar.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    items.add( 0, new_item ); // add to top of the list
-                }
+                if ( !item_exists ) items.add( 0, new_item ); // add to top of the list
+                else Snackbar.make( getView(), R.string.duplicate_item, Snackbar.LENGTH_SHORT).show();
             }
             catch( Exception ex )
             {
