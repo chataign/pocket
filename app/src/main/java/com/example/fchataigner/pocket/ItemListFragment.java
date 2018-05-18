@@ -10,18 +10,27 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import org.json.JSONArray;
+
+import com.example.fchataigner.pocket.interfaces.Displayable;
+import com.example.fchataigner.pocket.interfaces.JSONable;
+import com.example.fchataigner.pocket.interfaces.Listable;
+import com.example.fchataigner.pocket.interfaces.Shareable;
+
 import java.util.ArrayList;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 
-public class ItemListFragment<Item extends Listable & Displayable & JSONable & Parcelable>
+public class ItemListFragment<Item extends Listable & Displayable & JSONable & Parcelable & Shareable>
         extends Fragment
         implements
+        AsyncFileReader.Listener<Item>,
         ListView.OnItemClickListener,
         ListView.OnItemLongClickListener
 {
@@ -39,35 +48,45 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        try
-        {
-            Bundle args = getArguments();
-            String bundle_item = getContext().getString(R.string.bundle_item);
-            this.base_item = (Item) args.getParcelable(bundle_item);
-            String items_file = getContext().getString( base_item.getFileResource() );
+        setHasOptionsMenu(true);
 
-            JSONArray json = Utils.readJSONFile( getContext(), items_file );
+        Bundle args = getArguments();
+        String bundle_item = getContext().getString(R.string.bundle_item);
+        this.base_item = (Item) args.getParcelable(bundle_item);
 
-            items = new ArrayList<Item>();
+        String items_file = getContext().getString( base_item.getFileResource() );
+        JSONable.Builder builder = base_item.getBuilder();
 
-            for ( int i=0; i< json.length(); ++i )
-                items.add( (Item) base_item.buildFromJSON( json.getJSONObject(i) ) );
-
-            Log.i( TAG, String.format( "read %d items from file=", items.size(), items_file ) );
-        }
-        catch( Exception ex )
-        {
-            Log.w( TAG, String.format( "failed to read file, error=%s", ex.getMessage() ) );
-            items = new ArrayList<Item>();
-        }
+        AsyncFileReader<Item> file_reader = new AsyncFileReader<>( getContext(), builder, this );
+        file_reader.execute(items_file);
 
         return inflater.inflate(R.layout.itemlist_fragment, container, false);
     }
 
     @Override
-    public void onStart()
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        super.onStart();
+        inflater.inflate(R.menu.item_list_menu, menu);
+        super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menu_item)
+    {
+        switch (menu_item.getItemId())
+        {
+            case R.id.action_filter:
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(menu_item);
+        }
+    }
+
+    @Override
+    public void onItemsRead( ArrayList<Item> items )
+    {
+        this.items = items;
 
         ListView list = (ListView) getView().findViewById(R.id.list);
 
@@ -75,6 +94,12 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
         list.setAdapter( adapter );
         list.setOnItemClickListener(this);
         list.setOnItemLongClickListener(this);
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
 
         FloatingActionButton add_button = (FloatingActionButton) getView().findViewById(R.id.add_button);
         add_button.setOnClickListener(new View.OnClickListener()
@@ -93,18 +118,9 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
     @Override
     public void onStop()
     {
-        Log.i("Items", "ItemListFragment::onStop" );
-
-        try
-        {
-            String items_file = getContext().getString( base_item.getFileResource() );
-            Utils.writeJSONFile( items, getContext(), items_file );
-            Log.i( "Items", String.format( "saved %d items to file=%s", items.size(), items_file ) );
-        }
-        catch( Exception ex )
-        {
-            Log.e( "Items", "failed to save items to file" );
-        }
+        String items_file = getContext().getString( base_item.getFileResource() );
+        AsyncFileSaver<Item> file_saver = new AsyncFileSaver<>( getContext(), items_file, null );
+        file_saver.execute( items );
 
         super.onStop();
     }
@@ -130,7 +146,7 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
             }
             catch( Exception ex )
             {
-                Log.e( "Items", "failed to add item, error=" + ex.getMessage() );
+                Log.e( TAG, "failed to add item, error=" + ex.getMessage() );
             }
         }
     }

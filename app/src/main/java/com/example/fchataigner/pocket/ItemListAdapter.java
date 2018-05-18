@@ -7,7 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.SpinnerAdapter;
+
+import com.example.fchataigner.pocket.interfaces.Listable;
 
 import java.util.ArrayList;
 import java.util.List;

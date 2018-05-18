@@ -1,4 +1,4 @@
-package com.example.fchataigner.pocket;
+package com.example.fchataigner.pocket.places;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,15 +9,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.example.fchataigner.pocket.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReviewAdapter extends ArrayAdapter<Review>
+public class PlaceReviewAdapter extends ArrayAdapter<PlaceReview>
 {
     private Context context;
-    private List<Review> reviews;
+    private List<PlaceReview> reviews;
 
-    public ReviewAdapter(@NonNull Context context, @NonNull ArrayList<Review> reviews )
+    public PlaceReviewAdapter(@NonNull Context context, @NonNull ArrayList<PlaceReview> reviews )
     {
         super( context, 0 , reviews );
 
@@ -28,7 +30,7 @@ public class ReviewAdapter extends ArrayAdapter<Review>
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
     {
-        Review review = reviews.get(position);
+        PlaceReview review = reviews.get(position);
         View view = convertView;
 
         if(view == null)

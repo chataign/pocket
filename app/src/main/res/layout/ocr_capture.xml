@@ -7,16 +7,16 @@
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
-    <com.example.fchataigner.pocket.CameraSourcePreview
+    <com.example.fchataigner.pocket.ocr.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.example.fchataigner.pocket.GraphicOverlay
+        <com.example.fchataigner.pocket.ocr.GraphicOverlay
             android:id="@+id/graphicOverlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-    </com.example.fchataigner.pocket.CameraSourcePreview>
+    </com.example.fchataigner.pocket.ocr.CameraSourcePreview>
 
 </LinearLayout>

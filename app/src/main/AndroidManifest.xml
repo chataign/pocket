@@ -49,18 +49,18 @@
         </provider>
 
         <activity
-            android:name=".AddBookActivity"
+            android:name=".books.AddBookActivity"
             android:label="Add new book"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".AddPlaceActivity"
+            android:name=".places.AddPlaceActivity"
             android:label="Add new place"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
         <activity
-            android:name=".OcrCaptureActivity"
+            android:name=".ocr.OcrCaptureActivity"
             android:label="OCR Capture"
             android:theme="@style/AppTheme.NoActionBar" />
 

@@ -1,4 +1,4 @@
-package com.example.fchataigner.pocket;
+package com.example.fchataigner.pocket.places;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,29 +7,28 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.fchataigner.pocket.R;
+import com.example.fchataigner.pocket.interfaces.Displayable;
+import com.example.fchataigner.pocket.interfaces.JSONable;
+import com.example.fchataigner.pocket.interfaces.Listable;
+import com.example.fchataigner.pocket.interfaces.Shareable;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Locale;
 
-public class Place implements Parcelable, JSONable, Listable, Displayable, Cloneable
+public class Place implements Parcelable, JSONable, Listable, Displayable, Cloneable, Shareable
 {
     public String place_id;
     public String name;
@@ -38,6 +37,16 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Clone
     public String vicinity;
     public String icon;
     public ArrayList<String> types = new ArrayList<String>();
+
+    public class Builder implements JSONable.Builder
+    {
+        public Object buildFromJSON( JSONObject json ) throws JSONException
+        {
+            Place place = new Place();
+            place.readJSON(json);
+            return place;
+        }
+    }
 
     public Place() {}
 
@@ -49,13 +58,14 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Clone
     }
 
     @Override
+    public String getShareableString() { return String.format(
+            "Check out this place: \"%s\" at %s", this.name, this.vicinity ); }
+
+    @Override
     public int getDetailsLayout() { return R.layout.place_details; }
 
     @Override
     public int getItemLayout() { return R.layout.place_item; }
-
-    @Override
-    public int getAddActivityLayout() { return R.layout.add_place_activity; }
 
     @Override
     public int getFileResource() { return R.string.places_file; }
@@ -139,7 +149,7 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Clone
                 LinearLayout reviews_layout = (LinearLayout) view.findViewById(R.id.reviews);
                 LayoutInflater inflater = LayoutInflater.from(context);
 
-                for ( Review review : details.reviews)
+                for ( PlaceReview review : details.reviews)
                 {
                     View item_view = inflater.inflate(R.layout.review_item, reviews_layout, false);
                     review.populateView(item_view);
@@ -154,12 +164,7 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Clone
     }
 
     @Override
-    public Place buildFromJSON( JSONObject json ) throws JSONException
-    {
-        Place place = new Place();
-        place.readJSON(json);
-        return place;
-    }
+    public JSONable.Builder getBuilder() { return new Place.Builder(); }
 
     @Override
     public void readJSON( JSONObject json ) throws JSONException

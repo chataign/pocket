@@ -1,4 +1,4 @@
-package com.example.fchataigner.pocket;
+package com.example.fchataigner.pocket.places;
 
 import android.content.Context;
 import android.location.Location;
@@ -19,9 +19,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
-public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
+public class PlaceFinder extends AsyncTask< String, Void, ArrayList<Place> >
         implements Response.ErrorListener, Response.Listener<JSONObject>
 {
     public interface OnPlaceResultsListener
@@ -38,8 +37,8 @@ public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
     final int search_radius;
     final String type;
 
-    public FindPlace(Context context, @NonNull OnPlaceResultsListener listener,
-                     @NonNull Location location, int search_radius, String type )
+    public PlaceFinder(Context context, @NonNull OnPlaceResultsListener listener,
+                       @NonNull Location location, int search_radius, String type )
     {
         this.listener = listener;
         this.location = location;
@@ -73,18 +72,18 @@ public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
                     places.add( place );
             }
 
-            Log.i( "FindPlace", "results=" + results.length() );
+            Log.i( "PlaceFinder", "results=" + results.length() );
         }
         catch( Exception ex )
         {
-            Log.e( "FindPlace", ex.getMessage() ); return;
+            Log.e( "PlaceFinder", ex.getMessage() ); return;
         }
     }
 
     @Override
     public void onErrorResponse( VolleyError error )
     {
-        Log.e( "FindPlace", "VolleyError=" + error.toString() );
+        Log.e( "PlaceFinder", "VolleyError=" + error.toString() );
         //this.cancel(true);
     }
 
@@ -101,7 +100,7 @@ public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
         queryUrl += "&keyword=" + type;
         for ( String str : search_strings ) queryUrl += "+" + str;
 
-        Log.i("FindPlace", "url=" + queryUrl);
+        Log.i("PlaceFinder", "url=" + queryUrl);
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, queryUrl,
                 null, this, this);

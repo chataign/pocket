@@ -1,4 +1,4 @@
-package com.example.fchataigner.pocket;
+package com.example.fchataigner.pocket.interfaces;
 
 import android.content.Context;
 import android.view.View;
@@ -10,7 +10,6 @@ public interface Displayable
     int getItemLayout();
     int getDetailsLayout();
     int getFileResource();
-    int getAddActivityLayout();
 
     Class<?> getAddItemClass();
 }

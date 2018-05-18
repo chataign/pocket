@@ -1,4 +1,4 @@
-package com.example.fchataigner.pocket;
+package com.example.fchataigner.pocket.places;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,7 +14,7 @@ public class PlaceDetails
     public String name;
     public String phone_number;
     public String address;
-    public ArrayList<Review> reviews = new ArrayList<>();
+    public ArrayList<PlaceReview> reviews = new ArrayList<>();
 
     public static PlaceDetails fromGoogleJSON( JSONObject json ) throws JSONException
     {
@@ -30,7 +30,7 @@ public class PlaceDetails
         JSONArray json_reviews = json.getJSONArray("reviews");
 
         for ( int i=0; i< json_reviews.length(); ++i )
-            details.reviews.add( Review.fromGoogleJSON( json_reviews.getJSONObject(i) ) );
+            details.reviews.add( PlaceReview.fromGoogleJSON( json_reviews.getJSONObject(i) ) );
 
         return details;
     }

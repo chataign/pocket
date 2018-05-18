@@ -1,12 +1,14 @@
-package com.example.fchataigner.pocket;
+package com.example.fchataigner.pocket.places;
 
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.fchataigner.pocket.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Review
+class PlaceReview
 {
     public String author_name;
     public String author_url;
@@ -17,9 +19,9 @@ public class Review
     public String time;
     public String text;
 
-    public static Review fromGoogleJSON( JSONObject json ) throws JSONException
+    public static PlaceReview fromGoogleJSON(JSONObject json ) throws JSONException
     {
-        Review review = new Review();
+        PlaceReview review = new PlaceReview();
         review.author_name = json.getString("author_name");
         review.author_url = json.getString("author_url");
         review.language = json.getString("language");

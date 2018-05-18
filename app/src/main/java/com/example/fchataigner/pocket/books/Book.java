@@ -1,4 +1,4 @@
-package com.example.fchataigner.pocket;
+package com.example.fchataigner.pocket.books;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.fchataigner.pocket.R;
+import com.example.fchataigner.pocket.interfaces.Displayable;
+import com.example.fchataigner.pocket.interfaces.JSONable;
+import com.example.fchataigner.pocket.interfaces.Listable;
+import com.example.fchataigner.pocket.interfaces.Shareable;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -24,10 +29,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class Book implements Parcelable, JSONable, Listable, Displayable, Cloneable
+public class Book implements Parcelable, JSONable, Listable, Displayable, Cloneable, Shareable
 {
     public String isbn_13;
     public String isbn_10;
@@ -42,16 +46,27 @@ public class Book implements Parcelable, JSONable, Listable, Displayable, Clonea
     public String publisher;
     public String date;
 
+    public class Builder implements JSONable.Builder
+    {
+        public Object buildFromJSON( JSONObject json ) throws JSONException
+        {
+            Book book = new Book();
+            book.readJSON(json);
+            return book;
+        }
+    }
+
     public Book() {}
+
+    @Override
+    public String getShareableString() { return String.format(
+            "Check out this book: \"%s\" by %s", this.title, this.author ); }
 
     @Override
     public int getDetailsLayout() { return R.layout.book_details; }
 
     @Override
     public int getItemLayout() { return R.layout.book_item; }
-
-    @Override
-    public int getAddActivityLayout() { return R.layout.add_book_activity; }
 
     @Override
     public int getFileResource() { return R.string.books_file; }
@@ -147,12 +162,7 @@ public class Book implements Parcelable, JSONable, Listable, Displayable, Clonea
     }
 
     @Override
-    public Book buildFromJSON( JSONObject json ) throws JSONException
-    {
-        Book book = new Book();
-        book.readJSON(json);
-        return book;
-    }
+    public JSONable.Builder getBuilder() { return new Book.Builder(); }
 
     @Override
     public void readJSON( JSONObject json ) throws JSONException

@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public final class Utils
 {
@@ -35,28 +36,15 @@ public final class Utils
         return string_builder.toString();
     }
 
-    static final
-    JSONArray readJSONFile( Context context, String filename )
-            throws IOException, JSONException
+    static void writeString( String string, Context context, String filename ) throws IOException
     {
-        String json_str = Utils.readString( context, filename );
-        return (JSONArray) new JSONTokener(json_str).nextValue();
-    }
-
-    static final <T extends JSONable>
-    void writeJSONFile(ArrayList<T> items, Context context, String filename )
-            throws IOException, JSONException
-    {
-        JSONArray json = new JSONArray();
-        for ( JSONable item : items ) json.put( item.writeJSON() );
-
         FileOutputStream file = context.openFileOutput(filename, Context.MODE_PRIVATE);
         OutputStreamWriter writer = new OutputStreamWriter(file);
-        writer.write( json.toString() );
+        writer.write( string );
         writer.close();
     }
 
-    static final String join( String[] strings, String delimiter )
+    static String join( String[] strings, String delimiter )
     {
         String str = new String("");
         if ( strings.length == 0 ) return str;

@@ -1,4 +1,4 @@
-package com.example.fchataigner.pocket;
+package com.example.fchataigner.pocket.books;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -20,6 +19,10 @@ import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.fchataigner.pocket.ItemListAdapter;
+import com.example.fchataigner.pocket.Language;
+import com.example.fchataigner.pocket.R;
+import com.example.fchataigner.pocket.ocr.OcrCaptureActivity;
 import com.google.android.gms.common.api.CommonStatusCodes;
 
 import java.util.ArrayList;
@@ -28,7 +31,7 @@ import java.util.Collections;
 public class AddBookActivity extends AppCompatActivity
         implements
         SearchView.OnQueryTextListener,
-        FindBook.OnBookResultsListener,
+        BookFinder.OnBookResultsListener,
         ListView.OnItemClickListener
 {
     static private String TAG = "AddBookActivity";
@@ -101,7 +104,7 @@ public class AddBookActivity extends AppCompatActivity
 
         String[] query_strings = query.split(" ");
 
-        FindBook book_finder = new FindBook( this, language, type, this );
+        BookFinder book_finder = new BookFinder( this, language, type, this );
         book_finder.execute(query_strings);
 
         ProgressBar progress_bar = findViewById(R.id.progress_bar);

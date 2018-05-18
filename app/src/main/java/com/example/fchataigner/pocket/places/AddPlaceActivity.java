@@ -1,4 +1,4 @@
-package com.example.fchataigner.pocket;
+package com.example.fchataigner.pocket.places;
 
 import android.Manifest;
 import android.app.Activity;
@@ -29,6 +29,9 @@ import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.fchataigner.pocket.ItemListAdapter;
+import com.example.fchataigner.pocket.R;
+import com.example.fchataigner.pocket.ocr.OcrCaptureActivity;
 import com.google.android.gms.common.api.CommonStatusCodes;
 
 import java.util.ArrayList;
@@ -36,7 +39,7 @@ import java.util.ArrayList;
 public class AddPlaceActivity extends AppCompatActivity
         implements
         SearchView.OnQueryTextListener,
-        FindPlace.OnPlaceResultsListener,
+        PlaceFinder.OnPlaceResultsListener,
         ListView.OnItemClickListener,
         LocationListener
 {
@@ -168,7 +171,7 @@ public class AddPlaceActivity extends AppCompatActivity
         String place_type = (String) type_spinner.getSelectedItem();
 
         String[] search_strings = query.split(" ");
-        FindPlace place_finder = new FindPlace( this, this, location, search_radius, place_type );
+        PlaceFinder place_finder = new PlaceFinder( this, this, location, search_radius, place_type );
         place_finder.execute(search_strings);
 
         ProgressBar progress_bar = findViewById(R.id.progress_bar);

@@ -1,4 +1,4 @@
-package com.example.fchataigner.pocket;
+package com.example.fchataigner.pocket.places;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -12,10 +12,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.fchataigner.pocket.R;
 
 import org.json.JSONObject;
 
-public class GetPlaceDetails extends AsyncTask< Place, Void, PlaceDetails >
+public class GetPlaceDetails extends AsyncTask<Place, Void, PlaceDetails>
         implements Response.ErrorListener, Response.Listener<JSONObject>
 {
     static private String TAG = "GetPlaceDetails";

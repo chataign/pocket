@@ -1,4 +1,4 @@
-package com.example.fchataigner.pocket;
+package com.example.fchataigner.pocket.books;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -12,16 +12,17 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.fchataigner.pocket.Language;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class FindBook extends AsyncTask< String, Void, ArrayList<Book> >
+public class BookFinder extends AsyncTask< String, Void, ArrayList<Book> >
         implements Response.ErrorListener, Response.Listener<JSONObject>
 {
-    private static String TAG = "FindBook";
+    private static String TAG = "BookFinder";
 
     public interface OnBookResultsListener
     {
@@ -36,10 +37,10 @@ public class FindBook extends AsyncTask< String, Void, ArrayList<Book> >
     String base_url;
     int requestsPending;
 
-    public FindBook( @NonNull Context context,
-                     @NonNull Language language,
-                     @NonNull String type,
-                     @NonNull OnBookResultsListener listener )
+    public BookFinder(@NonNull Context context,
+                      @NonNull Language language,
+                      @NonNull String type,
+                      @NonNull OnBookResultsListener listener )
     {
         this.language = language;
         this.type = type;
@@ -76,7 +77,7 @@ public class FindBook extends AsyncTask< String, Void, ArrayList<Book> >
             }
             catch( Exception ex )
             {
-                Log.w( "FindBook.onResponse", ex.getMessage() );
+                Log.w( "BookFinder.onResponse", ex.getMessage() );
             }
         }
     }
