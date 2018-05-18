@@ -88,35 +88,6 @@ public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
         //this.cancel(true);
     }
 
-    class SortByDistance implements Comparator<Place>
-    {
-        private final Location location;
-
-        SortByDistance( @NonNull Location location )
-        {
-            this.location = location;
-        }
-
-        public int compare(Place place1, Place place2 )
-        {
-            Location l1 = new Location("place1");
-            Location l2 = new Location("place2");
-
-            l1.setLatitude(place1.latitude);
-            l1.setLongitude(place1.longitude);
-
-            l2.setLatitude(place2.latitude);
-            l2.setLongitude(place2.longitude);
-
-            double d1 = location.distanceTo(l1);
-            double d2 = location.distanceTo(l2);
-
-            if ( d1 < d2 ) return 1;
-            if ( d1 == d2 ) return 0;
-            return -1;
-        }
-    }
-
     protected ArrayList<Place> doInBackground( String... search_strings )
     {
         places.clear();
@@ -148,7 +119,7 @@ public class FindPlace extends AsyncTask< String, Void, ArrayList<Place> >
 
     protected void onPostExecute( ArrayList<Place> places )
     {
-        Collections.sort(places, new SortByDistance(location) );
+        Collections.sort(places, new Place.SortByDistance(location) );
         listener.onPlaceResults(places);
     }
 }

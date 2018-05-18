@@ -17,7 +17,7 @@ public class Language
         return name;
     } // for use in SpinnerAdapter
 
-    static final Language English = new Language( "English", "en" );
-    static final Language Spanish = new Language( "Español", "es" );
-    static final Language French = new Language( "Francais", "fr" );
+    static final Language English = new Language( "english", "en" );
+    static final Language Spanish = new Language( "español", "es" );
+    static final Language French = new Language( "français", "fr" );
 }

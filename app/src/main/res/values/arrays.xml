@@ -1,0 +1,16 @@
+<resources>
+    <integer-array name="search_radii">
+        <item>100</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>2000</item>
+    </integer-array>
+
+    <string-array name="place_types">
+        <item>food</item>
+        <item>bar</item>
+        <item>store</item>
+        <item>clothing_store</item>
+        <item>bakery</item>
+    </string-array>
+</resources>

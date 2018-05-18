@@ -25,10 +25,11 @@ public class FindBook extends AsyncTask< String, Void, ArrayList<Book> >
 
     public interface OnBookResultsListener
     {
-        public void onBookResults( ArrayList<Book> books );
+        void onBookResults( ArrayList<Book> books );
     }
 
     Language language;
+    String type;
     OnBookResultsListener listener;
     RequestQueue requestQueue;
     ArrayList<Book> books;
@@ -37,10 +38,13 @@ public class FindBook extends AsyncTask< String, Void, ArrayList<Book> >
 
     public FindBook( @NonNull Context context,
                      @NonNull Language language,
+                     @NonNull String type,
                      @NonNull OnBookResultsListener listener )
     {
-        this.listener = listener;
         this.language = language;
+        this.type = type;
+        this.listener = listener;
+
         books = new ArrayList<Book>();
         requestQueue = Volley.newRequestQueue(context);
         base_url = context.getString(com.example.fchataigner.pocket.R.string.book_api_url);
@@ -91,7 +95,7 @@ public class FindBook extends AsyncTask< String, Void, ArrayList<Book> >
         String query_url = base_url;
         for ( String str : search_strings ) query_url += "+" + str;
 
-        query_url += "&printType=books";
+        query_url += "&printType=" + type;
         query_url += "&maxResults=40";
         query_url += "&langRestrict=" + language.code;
         

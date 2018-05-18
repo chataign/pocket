@@ -2,9 +2,11 @@ package com.example.fchataigner.pocket;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +26,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Locale;
 
 public class Place implements Parcelable, JSONable, Listable, Displayable, Cloneable
@@ -252,5 +255,33 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Clone
     {
         final Place place = (Place) obj;
         return place != null && place.place_id.equals(this.place_id);
+    }
+
+    public Location getLocation()
+    {
+        Location location = new Location(this.place_id);
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        return location;
+    }
+
+    public static class SortByDistance implements Comparator<Place>
+    {
+        private final Location location;
+
+        SortByDistance( @NonNull Location location )
+        {
+            this.location = location;
+        }
+
+        public int compare(Place place1, Place place2 )
+        {
+            double d1 = location.distanceTo( place1.getLocation() );
+            double d2 = location.distanceTo( place2.getLocation() );
+
+            if ( d1 < d2 ) return 1;
+            if ( d1 > d2 ) return -1;
+            return 0;
+        }
     }
 };

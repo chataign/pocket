@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -49,10 +50,20 @@ public class AddBookActivity extends AppCompatActivity
         languages.add( Language.Spanish );
         languages.add( Language.French );
 
-        ArrayAdapter<Language> adapter = new ArrayAdapter<Language>( this, R.layout.spinner_item, R.id.spinner_text, languages );
+        ArrayAdapter<Language> language_adapter = new ArrayAdapter<Language>( this, R.layout.spinner_item, R.id.spinner_text, languages );
 
         Spinner language_spinner = findViewById(R.id.language_spinner);
-        language_spinner.setAdapter( adapter );
+        language_spinner.setAdapter( language_adapter );
+
+        ArrayList<String> types = new ArrayList<>();
+        types.add( "books" );
+        types.add( "magazines" );
+        types.add( "all" );
+
+        ArrayAdapter<String> type_adapter = new ArrayAdapter<>( this, R.layout.spinner_item, R.id.spinner_text, types );
+
+        Spinner type_spinner = findViewById(R.id.type_spinner);
+        type_spinner.setAdapter( type_adapter );
 
         final Activity activity = this;
 
@@ -80,15 +91,21 @@ public class AddBookActivity extends AppCompatActivity
     public boolean onQueryTextSubmit( String query )
     {
         Spinner language_spinner = findViewById(R.id.language_spinner);
+        Language language = (Language) language_spinner.getSelectedItem();
+
+        Spinner type_spinner = findViewById(R.id.type_spinner);
+        String type = (String) type_spinner.getSelectedItem();
 
         InputMethodManager manager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         manager.hideSoftInputFromWindow( language_spinner.getWindowToken(), 2);
 
         String[] query_strings = query.split(" ");
-        Language language = (Language) language_spinner.getSelectedItem();
 
-        FindBook book_finder = new FindBook( this, language, this );
+        FindBook book_finder = new FindBook( this, language, type, this );
         book_finder.execute(query_strings);
+
+        ProgressBar progress_bar = findViewById(R.id.progress_bar);
+        progress_bar.setVisibility(View.VISIBLE);
 
         return true;
     }
@@ -96,8 +113,11 @@ public class AddBookActivity extends AppCompatActivity
     @Override
     public void onBookResults( @NonNull ArrayList<Book> books )
     {
+        ProgressBar progress_bar = findViewById(R.id.progress_bar);
+        progress_bar.setVisibility(View.INVISIBLE);
+
         TextView info_text = findViewById(R.id.info_text);
-        info_text.setText( String.format( "found %d books", books.size() ) );
+        info_text.setText( String.format( "Found %d books", books.size() ) );
 
         Collections.sort( books, Book.OrderByRating );
 
@@ -128,8 +148,8 @@ public class AddBookActivity extends AppCompatActivity
             query = query.replaceAll("['\"+\n\t]"," ");
 
             SearchView search_view = findViewById(R.id.search_view);
-            search_view.setQuery( query, false );
-            this.onQueryTextSubmit(query);
+            search_view.setQuery( query, true );
+            //this.onQueryTextSubmit(query);
         }
     }
 }

@@ -16,13 +16,17 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -33,49 +37,58 @@ public class AddPlaceActivity extends AppCompatActivity
         implements
         SearchView.OnQueryTextListener,
         FindPlace.OnPlaceResultsListener,
-        ListView.OnItemClickListener
+        ListView.OnItemClickListener,
+        LocationListener
 {
     static private String TAG = "AddPlaceActivity";
+    static private String LOCATION_UNAVAILABLE = "Location unavailable";
+
     static private int ACCESS_COARSE_LOCATION = 1;
     static private int ACCESS_FINE_LOCATION = 2;
 
     private Location location = null;
+    private View activity_view = null;
 
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
         super.onCreate(savedInstanceState);
 
-        setContentView( R.layout.add_place_activity );
-        setSupportActionBar( (Toolbar) findViewById(R.id.toolbar) );
+        LayoutInflater layout_inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        activity_view = layout_inflater.inflate( R.layout.add_place_activity, null );
+        setContentView( activity_view );
+        
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar( toolbar );
 
         requestLocationPermissions();
 
         LocationManager location_manager = (LocationManager)
                 this.getSystemService(Context.LOCATION_SERVICE);
 
-        LocationListener location_listener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location new_location) { location = new_location; }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-            @Override
-            public void onProviderEnabled(String provider) {}
-
-            @Override
-            public void onProviderDisabled(String provider) {}
-        };
-
-        try { location_manager.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 100, 0, location_listener ); }
+        try { location_manager.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 100, 0, this ); }
         catch( SecurityException ex ) { Log.e( TAG, "location listener error=" + ex.getMessage() ); }
 
         SearchView search_view = findViewById(R.id.search_view);
         search_view.setQueryHint( "place name, address" );
         search_view.setOnQueryTextListener(this);
 
+        String[] place_types = this.getResources().getStringArray(R.array.place_types);
+        ArrayAdapter<String> type_adapter = new ArrayAdapter<>( this, R.layout.spinner_item, R.id.spinner_text, place_types );
+        Spinner type_spinner = findViewById(R.id.type_spinner);
+        type_spinner.setAdapter( type_adapter );
+
+        ArrayList<Integer> search_radii = new ArrayList<>();
+        for ( int radius : this.getResources().getIntArray(R.array.search_radii) ) search_radii.add(radius);
+
+        ArrayAdapter<Integer> radius_adapter = new ArrayAdapter<>( this, R.layout.spinner_item, R.id.spinner_text, search_radii );
+        Spinner radius_spinner = findViewById(R.id.radius_spinner);
+        radius_spinner.setAdapter( radius_adapter );
+
         final Activity activity = this;
+
+        TextView location_text = findViewById(R.id.location_text);
+        location_text.setText( LOCATION_UNAVAILABLE );
 
         ImageButton camera_button = findViewById(R.id.camera_button);
         camera_button.setOnClickListener( new Button.OnClickListener()
@@ -83,6 +96,12 @@ public class AddPlaceActivity extends AppCompatActivity
             @Override
             public void onClick( View view )
             {
+                if ( location == null )
+                {
+                    Snackbar.make( activity_view, LOCATION_UNAVAILABLE, Snackbar.LENGTH_SHORT ).show();
+                    return;
+                }
+
                 Intent intent = new Intent( activity, OcrCaptureActivity.class );
                 intent.putExtra(OcrCaptureActivity.AutoFocus, true);
                 intent.putExtra(OcrCaptureActivity.UseFlash, false);
@@ -90,6 +109,24 @@ public class AddPlaceActivity extends AppCompatActivity
             }
         } );
     }
+
+    @Override
+    public void onLocationChanged(Location new_location)
+    {
+        TextView location_text = findViewById(R.id.location_text);
+        location_text.setText( String.format( "Location accuracy: %dm", (int) new_location.getAccuracy() ) );
+
+        location = new_location;
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+    @Override
+    public void onProviderEnabled(String provider) {}
+
+    @Override
+    public void onProviderDisabled(String provider) {}
 
     void requestLocationPermissions()
     {
@@ -115,20 +152,27 @@ public class AddPlaceActivity extends AppCompatActivity
     @Override
     public boolean onQueryTextSubmit( String query )
     {
-        SearchView search_view = findViewById(R.id.search_view);
-
         InputMethodManager manager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-        manager.hideSoftInputFromWindow( search_view.getWindowToken(), 0);
+        manager.hideSoftInputFromWindow( activity_view.getWindowToken(), 0);
 
         if ( location == null )
         {
-            Snackbar.make( search_view, "No GPS location", Snackbar.LENGTH_SHORT ).show();
+            Snackbar.make( activity_view, LOCATION_UNAVAILABLE, Snackbar.LENGTH_SHORT ).show();
             return false;
         }
 
+        Spinner radius_spinner = findViewById(R.id.radius_spinner);
+        Integer search_radius = (Integer) radius_spinner.getSelectedItem();
+
+        Spinner type_spinner = findViewById(R.id.type_spinner);
+        String place_type = (String) type_spinner.getSelectedItem();
+
         String[] search_strings = query.split(" ");
-        FindPlace place_finder = new FindPlace( this, this, location, 1000, "food" );
+        FindPlace place_finder = new FindPlace( this, this, location, search_radius, place_type );
         place_finder.execute(search_strings);
+
+        ProgressBar progress_bar = findViewById(R.id.progress_bar);
+        progress_bar.setVisibility(View.VISIBLE);
 
         return true;
     }
@@ -136,8 +180,11 @@ public class AddPlaceActivity extends AppCompatActivity
     @Override
     public void onPlaceResults( @NonNull ArrayList<Place> places )
     {
+        ProgressBar progress_bar = findViewById(R.id.progress_bar);
+        progress_bar.setVisibility(View.INVISIBLE);
+
         TextView info_text = findViewById(R.id.info_text);
-        info_text.setText( String.format( "found %d places", places.size() ) );
+        info_text.setText( String.format( "Found %d places", places.size() ) );
 
         ListView results_list = findViewById(R.id.results_list);
         results_list.setAdapter( new ItemListAdapter( this.getApplicationContext(), places, R.layout.place_item ) );
@@ -160,9 +207,14 @@ public class AddPlaceActivity extends AppCompatActivity
     @Override
     public void onActivityResult( int request, int result, Intent intent )
     {
+        if ( intent == null )
+            return;
+
         if ( request == OcrCaptureActivity.GET_TEXT && result == CommonStatusCodes.SUCCESS )
         {
             String query = intent.getStringExtra( OcrCaptureActivity.TextBlockObject );
+            if ( query == null ) return;
+
             query = query.replaceAll("['\"+\n\t]"," ");
 
             SearchView search_view = findViewById(R.id.search_view);
