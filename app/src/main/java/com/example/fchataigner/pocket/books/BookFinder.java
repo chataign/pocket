@@ -24,14 +24,14 @@ public class BookFinder extends AsyncTask< String, Void, ArrayList<Book> >
 {
     private static String TAG = "BookFinder";
 
-    public interface OnBookResultsListener
+    public interface Listener
     {
-        void onBookResults( ArrayList<Book> books );
+        void onResults( ArrayList<Book> books );
     }
 
     Language language;
     String type;
-    OnBookResultsListener listener;
+    Listener listener;
     RequestQueue requestQueue;
     ArrayList<Book> books;
     String base_url;
@@ -40,7 +40,7 @@ public class BookFinder extends AsyncTask< String, Void, ArrayList<Book> >
     public BookFinder(@NonNull Context context,
                       @NonNull Language language,
                       @NonNull String type,
-                      @NonNull OnBookResultsListener listener )
+                      @NonNull Listener listener )
     {
         this.language = language;
         this.type = type;
@@ -115,5 +115,5 @@ public class BookFinder extends AsyncTask< String, Void, ArrayList<Book> >
     }
 
     protected void onPreExecute() {}
-    protected void onPostExecute( ArrayList<Book> books ) { listener.onBookResults(books); }
+    protected void onPostExecute( ArrayList<Book> books ) { listener.onResults(books); }
 }

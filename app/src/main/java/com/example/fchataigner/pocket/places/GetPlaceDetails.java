@@ -29,7 +29,7 @@ public class GetPlaceDetails extends AsyncTask<Place, Void, PlaceDetails>
     OnDetailsReceived listener;
     RequestQueue request_queue;
     String base_url, api_key;
-    int requests_pending=0;
+    boolean request_running=false;
     PlaceDetails details=null;
 
     public GetPlaceDetails( @NonNull Context context, @NonNull OnDetailsReceived listener )
@@ -43,10 +43,10 @@ public class GetPlaceDetails extends AsyncTask<Place, Void, PlaceDetails>
     @Override
     public void onResponse( JSONObject response )
     {
-        requests_pending--;
-
         try { details = PlaceDetails.fromGoogleJSON( response.getJSONObject("result") ); }
         catch( Exception ex ) { Log.e( TAG, ex.getMessage() ); }
+
+        request_running=false;
     }
 
     @Override
@@ -71,10 +71,10 @@ public class GetPlaceDetails extends AsyncTask<Place, Void, PlaceDetails>
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, query_url,
                 null, this, this);
 
-        requests_pending++;
         request_queue.add(request);
+        request_running=true;
 
-        while( requests_pending > 0 )
+        while( request_running )
             SystemClock.sleep(100 );
 
         return details;

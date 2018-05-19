@@ -4,6 +4,8 @@
     <string name="book_api_url">https://www.googleapis.com/books/v1/volumes?q=search</string>
     <string name="places_api_url">https://maps.googleapis.com/maps/api/place/nearbysearch/json?</string>
     <string name="places_details_api_url">https://maps.googleapis.com/maps/api/place/details/json?</string>
+    <string name="goodreads_api_read_key">lWhRU6SpBbLrSzr11U1Jg</string>
+    <string name="goodreads_api_write_key">bVwsm5oDqWbAdBtlcBNju5kK2vM3lWZMIcUIIdeM</string>
     <string name="books_file">pocket_books.json</string>
     <string name="places_file">pocket_places.json</string>
     <string name="google_api_key">AIzaSyCWlKWcaacfy6xAyetqP2l3XmVTai4Cfhc</string>

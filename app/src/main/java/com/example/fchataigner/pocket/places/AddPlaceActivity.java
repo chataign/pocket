@@ -30,16 +30,19 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.fchataigner.pocket.ItemListAdapter;
+import com.example.fchataigner.pocket.ItemListFragment;
 import com.example.fchataigner.pocket.R;
+import com.example.fchataigner.pocket.Utils;
 import com.example.fchataigner.pocket.ocr.OcrCaptureActivity;
 import com.google.android.gms.common.api.CommonStatusCodes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class AddPlaceActivity extends AppCompatActivity
         implements
         SearchView.OnQueryTextListener,
-        PlaceFinder.OnPlaceResultsListener,
+        PlaceFinder.Listener,
         ListView.OnItemClickListener,
         LocationListener
 {
@@ -50,7 +53,10 @@ public class AddPlaceActivity extends AppCompatActivity
     static private int ACCESS_FINE_LOCATION = 2;
 
     private Location location = null;
+    private int location_count=0;
     private View activity_view = null;
+    private ItemListAdapter<Place> place_adapter = null;
+    private PlaceFinder place_finder=null;
 
     @Override
     protected void onCreate( Bundle savedInstanceState )
@@ -69,8 +75,26 @@ public class AddPlaceActivity extends AppCompatActivity
         LocationManager location_manager = (LocationManager)
                 this.getSystemService(Context.LOCATION_SERVICE);
 
-        try { location_manager.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 100, 0, this ); }
-        catch( SecurityException ex ) { Log.e( TAG, "location listener error=" + ex.getMessage() ); }
+        TextView location_text = findViewById(R.id.location_text);
+        location_text.setText( LOCATION_UNAVAILABLE );
+
+        try
+        {
+            Location last_location = location_manager.getLastKnownLocation( LocationManager.NETWORK_PROVIDER );
+            this.onLocationChanged(last_location);
+
+            location_manager.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, 0, 0, this );
+            location_manager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 0, 0, this );
+        }
+        catch( SecurityException ex )
+        {
+            Log.e( TAG, "location listener error=" + ex.getMessage() );
+        }
+
+        place_adapter = new ItemListAdapter( this.getApplicationContext(), new ArrayList<Place>(), R.layout.place_item );
+        ListView results_list = findViewById(R.id.results_list);
+        results_list.setAdapter( place_adapter );
+        results_list.setOnItemClickListener(this);
 
         SearchView search_view = findViewById(R.id.search_view);
         search_view.setQueryHint( "place name, address" );
@@ -89,9 +113,6 @@ public class AddPlaceActivity extends AppCompatActivity
         radius_spinner.setAdapter( radius_adapter );
 
         final Activity activity = this;
-
-        TextView location_text = findViewById(R.id.location_text);
-        location_text.setText( LOCATION_UNAVAILABLE );
 
         ImageButton camera_button = findViewById(R.id.camera_button);
         camera_button.setOnClickListener( new Button.OnClickListener()
@@ -117,7 +138,8 @@ public class AddPlaceActivity extends AppCompatActivity
     public void onLocationChanged(Location new_location)
     {
         TextView location_text = findViewById(R.id.location_text);
-        location_text.setText( String.format( "Location accuracy: %dm", (int) new_location.getAccuracy() ) );
+        location_text.setText( String.format( "Location accuracy: %dm (%d)",
+                (int) new_location.getAccuracy(), ++location_count ) );
 
         location = new_location;
     }
@@ -170,33 +192,45 @@ public class AddPlaceActivity extends AppCompatActivity
         Spinner type_spinner = findViewById(R.id.type_spinner);
         String place_type = (String) type_spinner.getSelectedItem();
 
-        String[] search_strings = query.split(" ");
-        PlaceFinder place_finder = new PlaceFinder( this, this, location, search_radius, place_type );
-        place_finder.execute(search_strings);
-
         ProgressBar progress_bar = findViewById(R.id.progress_bar);
         progress_bar.setVisibility(View.VISIBLE);
+
+        place_adapter.clear();
+        place_adapter.notifyDataSetChanged();
+
+        if ( place_finder != null ) place_finder.cancel(true);
+        place_finder = new PlaceFinder( this, this, location, search_radius, place_type, query );
+        place_finder.execute();
 
         return true;
     }
 
     @Override
-    public void onPlaceResults( @NonNull ArrayList<Place> places )
+    public void onNewResults( @NonNull ArrayList<Place> places )
     {
-        ProgressBar progress_bar = findViewById(R.id.progress_bar);
-        progress_bar.setVisibility(View.INVISIBLE);
+        Log.i( TAG, String.format( "received %d search results", places.size() ) );
+
+        place_adapter.addAll(places);
+        place_adapter.sort( new Place.SortByDistance(location) );
+        place_adapter.notifyDataSetChanged();
 
         TextView info_text = findViewById(R.id.info_text);
-        info_text.setText( String.format( "Found %d places", places.size() ) );
+        info_text.setText( String.format( "Found %d places", place_adapter.getCount() ) );
+    }
 
-        ListView results_list = findViewById(R.id.results_list);
-        results_list.setAdapter( new ItemListAdapter( this.getApplicationContext(), places, R.layout.place_item ) );
-        results_list.setOnItemClickListener(this);
+    @Override
+    public void onPostExecute()
+    {
+        Log.i( TAG, "onPostExecute");
+        ProgressBar progress_bar = findViewById(R.id.progress_bar);
+        progress_bar.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void onItemClick(AdapterView<?> list, View view, int position, long id )
     {
+        if ( place_finder != null ) place_finder.cancel(true);
+
         Place place = (Place) list.getItemAtPosition(position);
 
         Intent intent = new Intent();
@@ -215,10 +249,17 @@ public class AddPlaceActivity extends AppCompatActivity
 
         if ( request == OcrCaptureActivity.GET_TEXT && result == CommonStatusCodes.SUCCESS )
         {
-            String query = intent.getStringExtra( OcrCaptureActivity.TextBlockObject );
-            if ( query == null ) return;
+            ArrayList<String> strings = intent.getStringArrayListExtra( OcrCaptureActivity.TextBlockObject );
 
+            if ( strings == null || strings.isEmpty() )
+            {
+                Log.w( TAG, "No strings received from OCR");
+                return;
+            }
+
+            String query = Utils.join( strings, " " );
             query = query.replaceAll("['\"+\n\t]"," ");
+            Log.i( TAG, "query=" + query );
 
             SearchView search_view = findViewById(R.id.search_view);
             search_view.setQuery( query, false );

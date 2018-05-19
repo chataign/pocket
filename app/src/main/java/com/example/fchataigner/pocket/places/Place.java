@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class Place implements Parcelable, JSONable, Listable, Displayable, Cloneable, Shareable
+public class Place implements Parcelable, JSONable, Listable, Displayable, Shareable
 {
     public String place_id;
     public String name;
@@ -36,7 +36,8 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Clone
     public double longitude;
     public String vicinity;
     public String icon;
-    public ArrayList<String> types = new ArrayList<String>();
+    public ArrayList<String> types = new ArrayList<>();
+    public Double distance=null;
 
     public class Builder implements JSONable.Builder
     {
@@ -49,13 +50,6 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Clone
     }
 
     public Place() {}
-
-    public static Place fromJSON( JSONObject json ) throws JSONException
-    {
-        Place place = new Place();
-        place.readJSON(json);
-        return place;
-    }
 
     @Override
     public String getShareableString() { return String.format(
@@ -90,12 +84,18 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Clone
 
         TextView vicinity_field = view.findViewById(R.id.vicinity);
         vicinity_field.setText( vicinity );
+
+        if ( distance != null )
+        {
+            TextView distance_field = view.findViewById(R.id.distance);
+            distance_field.setText( String.format( "distance: %dm", distance.intValue() ) );
+        }
     }
 
     @Override
     public void createDetailsView( final Context context, final View view )
     {
-        ImageView image_view = (ImageView) view.findViewById(R.id.icon);
+        ImageView image_view = view.findViewById(R.id.icon);
 
         Picasso.get()
                 .load(icon)
@@ -104,10 +104,10 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Clone
                 .centerCrop()
                 .into(image_view);
 
-        TextView name_view = (TextView) view.findViewById(R.id.name);
+        TextView name_view = view.findViewById(R.id.name);
         name_view.setText(name);
 
-        TextView vicinity_view = (TextView) view.findViewById(R.id.vicinity);
+        TextView vicinity_view = view.findViewById(R.id.vicinity);
         vicinity_view.setText(vicinity);
 
         TextView types_field = view.findViewById(R.id.types);
@@ -124,7 +124,8 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Clone
                     @Override
                     public void onClick(View v)
                     {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(details.website_url) );
+                        Uri website = Uri.parse(details.website_url);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, website );
                         context.startActivity(intent);
                     }
                 } );
@@ -146,7 +147,7 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Clone
                 TextView reviews_header = view.findViewById(R.id.reviews_header);
                 reviews_header.setText( String.format( "%d reviews", details.reviews.size() ) );
 
-                LinearLayout reviews_layout = (LinearLayout) view.findViewById(R.id.reviews);
+                LinearLayout reviews_layout = view.findViewById(R.id.reviews);
                 LayoutInflater inflater = LayoutInflater.from(context);
 
                 for ( PlaceReview review : details.reviews)
@@ -284,9 +285,7 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Clone
             double d1 = location.distanceTo( place1.getLocation() );
             double d2 = location.distanceTo( place2.getLocation() );
 
-            if ( d1 < d2 ) return 1;
-            if ( d1 > d2 ) return -1;
-            return 0;
+            return Double.compare(d1,d2);
         }
     }
-};
+}

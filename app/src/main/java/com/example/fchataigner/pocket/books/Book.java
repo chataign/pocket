@@ -22,16 +22,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.Cloneable;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 
-public class Book implements Parcelable, JSONable, Listable, Displayable, Cloneable, Shareable
+public class Book implements Parcelable, JSONable, Listable, Displayable, Shareable
 {
     public String isbn_13;
     public String isbn_10;
@@ -74,7 +74,7 @@ public class Book implements Parcelable, JSONable, Listable, Displayable, Clonea
     @Override
     public Class<?> getAddItemClass() { return AddBookActivity.class; }
 
-    String getMonth() throws ParseException
+    public String getMonth() throws ParseException
     {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Calendar calendar = new GregorianCalendar();
@@ -84,7 +84,7 @@ public class Book implements Parcelable, JSONable, Listable, Displayable, Clonea
         return months[month];
     }
 
-    int getYear() throws ParseException
+    public int getYear() throws ParseException
     {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Calendar calendar = new GregorianCalendar();
@@ -114,7 +114,7 @@ public class Book implements Parcelable, JSONable, Listable, Displayable, Clonea
     @Override
     public void createDetailsView( final Context context, View view )
     {
-        ImageView image_view = (ImageView) view.findViewById(R.id.thumbnail);
+        ImageView image_view = view.findViewById(R.id.thumbnail);
 
         Picasso.get()
                 .load(thumbnail)
@@ -122,22 +122,22 @@ public class Book implements Parcelable, JSONable, Listable, Displayable, Clonea
                 .centerCrop()
                 .into(image_view);
 
-        TextView title_view = (TextView) view.findViewById(R.id.title);
+        TextView title_view = view.findViewById(R.id.title);
         title_view.setText(title);
 
-        TextView author_view = (TextView) view.findViewById(R.id.author);
+        TextView author_view = view.findViewById(R.id.author);
         author_view.setText(author);
 
-        TextView ratings = (TextView) view.findViewById(R.id.ratings);
+        TextView ratings = view.findViewById(R.id.ratings);
         ratings.setText( String.format("%.1f (from %d reviews)", averageRating, ratingsCount ) );
 
-        TextView description_view = (TextView) view.findViewById(R.id.description);
+        TextView description_view = view.findViewById(R.id.description);
         description_view.setText( description );
 
-        TextView publisher_view = (TextView) view.findViewById(R.id.publisher);
+        TextView publisher_view = view.findViewById(R.id.publisher);
         publisher_view.setText( publisher );
 
-        TextView date_view = (TextView) view.findViewById(R.id.date);
+        TextView date_view = view.findViewById(R.id.date);
 
         try
         {
@@ -159,6 +159,21 @@ public class Book implements Parcelable, JSONable, Listable, Displayable, Clonea
                 context.startActivity(intent);
             }
         } );
+
+        /*
+        GetBookAuthor.Listener author_listener = new GetBookAuthor.Listener()
+        {
+            @Override
+            public void onResults(final ArrayList<BookAuthor> authors )
+            {
+                for ( BookAuthor author : authors )
+                    Log.i( "BookAuthor", "read author: name=" + author.name + " id=" + author.id );
+            }
+        };
+
+        GetBookAuthor get_authors = new GetBookAuthor( context, author_listener );
+        get_authors.execute( this.author );
+        */
     }
 
     @Override
@@ -244,42 +259,23 @@ public class Book implements Parcelable, JSONable, Listable, Displayable, Clonea
     {
         JSONObject volumeInfo = json.getJSONObject("volumeInfo");
         JSONObject accessInfo = json.getJSONObject("accessInfo");
+        JSONArray identifiers = volumeInfo.getJSONArray("industryIdentifiers");
+        JSONObject imageLinks = volumeInfo.getJSONObject("imageLinks");
 
         Book book = new Book();
 
-        book.title       = volumeInfo.getString("title");
-        book.language    = volumeInfo.getString("language");
-        book.author      = volumeInfo.getJSONArray("authors").getString(0);
-        book.description = volumeInfo.getString("description");
-        book.publisher   = volumeInfo.getString("publisher");
-        book.date        = volumeInfo.getString("publishedDate");
-        book.link        = accessInfo.getString("webReaderLink");
-
-        JSONArray ids = volumeInfo.getJSONArray("industryIdentifiers");
-
-        book.isbn_13 = ids.getJSONObject(0).getString("identifier");
-        book.isbn_10 = ids.getJSONObject(1).getString("identifier");
-
-        try
-        {
-            JSONObject images = volumeInfo.getJSONObject("imageLinks");
-            book.thumbnail = images.getString("thumbnail");
-        }
-        catch( Exception ex )
-        {
-            book.thumbnail = "";
-        }
-
-        try
-        {
-            book.averageRating = volumeInfo.getDouble("averageRating");
-            book.ratingsCount = volumeInfo.getInt("ratingsCount");
-        }
-        catch( Exception ex )
-        {
-            book.averageRating = 0.0;
-            book.ratingsCount = 0;
-        }
+        book.title          = volumeInfo.getString("title");
+        book.language       = volumeInfo.getString("language");
+        book.author         = volumeInfo.getJSONArray("authors").getString(0);
+        book.description    = volumeInfo.getString("description");
+        book.publisher      = volumeInfo.getString("publisher");
+        book.date           = volumeInfo.getString("publishedDate");
+        book.link           = accessInfo.getString("webReaderLink");
+        book.isbn_13        = identifiers.getJSONObject(0).getString("identifier");
+        book.isbn_10        = identifiers.getJSONObject(1).getString("identifier");
+        book.thumbnail      = imageLinks.optString("thumbnail","");
+        book.averageRating  = volumeInfo.optDouble("averageRating",0.0);
+        book.ratingsCount   = volumeInfo.optInt("ratingsCount",0);
 
         return book;
     }
@@ -297,13 +293,13 @@ public class Book implements Parcelable, JSONable, Listable, Displayable, Clonea
         public Book[] newArray(int size) { return new Book[size]; }
     };
 
-    public static final Comparator<Book> OrderByRating = new Comparator<Book>()
+    public static Comparator<Book> OrderByRating = new Comparator<Book>()
     {
         public int compare( Book book1, Book book2 )
         {
             if ( book1.ratingsCount < book2.ratingsCount ) return 1;
-            else if ( book1.ratingsCount == book2.ratingsCount ) return 0;
-            return -1;
+            if ( book1.ratingsCount > book2.ratingsCount ) return -1;
+            return 0;
         }
     };
-};
+}

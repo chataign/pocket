@@ -10,8 +10,10 @@ import com.example.fchataigner.pocket.interfaces.JSONable;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class AsyncFileSaver<Item extends JSONable> extends AsyncTask< ArrayList<Item>, Void, Void >
+public class AsyncFileSaver<Item extends JSONable>
+        extends AsyncTask< List<Item>, Void, Void >
 {
     interface Listener
     {
@@ -34,14 +36,14 @@ public class AsyncFileSaver<Item extends JSONable> extends AsyncTask< ArrayList<
         this.listener = listener;
     }
 
-    protected Void doInBackground( ArrayList<Item>... item_lists )
+    protected Void doInBackground( List<Item>... item_lists )
     {
         success=true;
 
         try
         {
             JSONArray json = new JSONArray();
-            for ( ArrayList<Item> items : item_lists )
+            for ( List<Item> items : item_lists )
                 for ( JSONable item : items ) json.put( item.writeJSON() );
 
             Utils.writeString( json.toString(), context, filename );

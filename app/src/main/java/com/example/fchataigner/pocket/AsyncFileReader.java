@@ -12,11 +12,12 @@ import org.json.JSONTokener;
 
 import java.util.ArrayList;
 
-public class AsyncFileReader<Item> extends AsyncTask< String, Void, ArrayList<Item> >
+public class AsyncFileReader<Item>
+        extends AsyncTask< String, Void, ArrayList<Item> >
 {
     public interface Listener<Item>
     {
-        void onItemsRead( ArrayList<Item> items );
+        void onResult( ArrayList<Item> items );
     }
 
     static final private String TAG = "AsyncFileReader";
@@ -57,6 +58,5 @@ public class AsyncFileReader<Item> extends AsyncTask< String, Void, ArrayList<It
         return items;
     }
 
-    protected void onPreExecute() {}
-    protected void onPostExecute( ArrayList<Item> items ) { if ( listener != null ) listener.onItemsRead(items); }
+    protected void onPostExecute( ArrayList<Item> items ) { if ( listener != null ) listener.onResult(items); }
 }

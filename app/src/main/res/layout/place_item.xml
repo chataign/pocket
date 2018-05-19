@@ -30,4 +30,12 @@
         android:layout_toRightOf="@id/icon"
         android:theme="@style/ListItemSubtitle" />
 
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/vicinity"
+        android:layout_toRightOf="@id/icon"
+        android:theme="@style/NormalText" />
+
 </RelativeLayout>

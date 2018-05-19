@@ -19,6 +19,9 @@ public class ItemListAdapter<Item extends Listable> extends ArrayAdapter<Item>
     private List<Item> items;
     private int layout_resource;
 
+    int removed_position;
+    Item removed_item=null;
+
     public ItemListAdapter(@NonNull Context context, @NonNull ArrayList<Item> items, int layout_resource )
     {
         super( context, 0 , items );
@@ -27,6 +30,32 @@ public class ItemListAdapter<Item extends Listable> extends ArrayAdapter<Item>
         this.items = items;
         this.layout_resource = layout_resource;
      }
+
+    public Item get( int position )
+    {
+        return items.get(position);
+    }
+
+    public void remove( int position )
+    {
+        removed_item = items.get(position);
+        removed_position=position;
+
+        items.remove(position);
+        notifyDataSetChanged();
+    }
+
+    public void undoRemove()
+    {
+        if ( removed_item == null ) return;
+        this.insert( removed_item, removed_position );
+        removed_item = null;
+    }
+
+    public List<Item> getItems()
+    {
+        return items;
+    }
 
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)

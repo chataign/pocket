@@ -37,10 +37,7 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
     public final int REQUEST_ADD_ITEM = 1;
     public final String TAG = "ItemListFragment";
 
-    private ArrayList<Item> items = new ArrayList<Item>();
-    private ItemListAdapter<Item> adapter = null;
-    private int deleted_position;
-    private Item deleted_item=null;
+    private ItemListAdapter<Item> item_adapter = null;
     private Item base_item=null;
 
     public ItemListFragment() {}
@@ -60,7 +57,43 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
         AsyncFileReader<Item> file_reader = new AsyncFileReader<>( getContext(), builder, this );
         file_reader.execute(items_file);
 
+        item_adapter = new ItemListAdapter<Item>( getContext(), new ArrayList<Item>(), base_item.getItemLayout() );
+
         return inflater.inflate(R.layout.itemlist_fragment, container, false);
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+
+        ListView list = (ListView) getView().findViewById(R.id.list);
+        list.setAdapter( item_adapter );
+        list.setOnItemClickListener(this);
+        list.setOnItemLongClickListener(this);
+
+        FloatingActionButton add_button = (FloatingActionButton) getView().findViewById(R.id.add_button);
+        add_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                String bundle_item = getContext().getString(R.string.bundle_item);
+                Intent intent = new Intent( getActivity(), base_item.getAddItemClass() );
+                intent.putExtra( bundle_item, base_item );
+                startActivityForResult( intent, REQUEST_ADD_ITEM );
+            }
+        });
+    }
+
+    @Override
+    public void onStop()
+    {
+        String items_file = getContext().getString( base_item.getFileResource() );
+        AsyncFileSaver<Item> file_saver = new AsyncFileSaver<>( getContext(), items_file, null );
+        file_saver.execute( item_adapter.getItems() );
+
+        super.onStop();
     }
 
     @Override
@@ -84,45 +117,10 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
     }
 
     @Override
-    public void onItemsRead( ArrayList<Item> items )
+    public void onResult( ArrayList<Item> items )
     {
-        this.items = items;
-
-        ListView list = (ListView) getView().findViewById(R.id.list);
-
-        adapter = new ItemListAdapter<Item>( getContext(), items, base_item.getItemLayout() );
-        list.setAdapter( adapter );
-        list.setOnItemClickListener(this);
-        list.setOnItemLongClickListener(this);
-    }
-
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-
-        FloatingActionButton add_button = (FloatingActionButton) getView().findViewById(R.id.add_button);
-        add_button.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                String bundle_item = getContext().getString(R.string.bundle_item);
-                Intent intent = new Intent( getActivity(), base_item.getAddItemClass() );
-                intent.putExtra( bundle_item, base_item );
-                startActivityForResult( intent, REQUEST_ADD_ITEM );
-            }
-        });
-    }
-
-    @Override
-    public void onStop()
-    {
-        String items_file = getContext().getString( base_item.getFileResource() );
-        AsyncFileSaver<Item> file_saver = new AsyncFileSaver<>( getContext(), items_file, null );
-        file_saver.execute( items );
-
-        super.onStop();
+        item_adapter.addAll(items);
+        item_adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -138,10 +136,15 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
 
                 boolean item_exists=false;
 
-                for ( Item item : items )
+                for ( Item item : item_adapter.getItems() )
                     if ( new_item.equals(item) ) { item_exists=true; break; }
 
-                if ( !item_exists ) items.add( 0, new_item ); // add to top of the list
+                if ( !item_exists )
+                {
+                    item_adapter.insert(new_item, 0); // add to top of the list
+                    item_adapter.notifyDataSetChanged();
+                    Log.i( TAG, "added item=" + new_item.toString() );
+                }
                 else Snackbar.make( getView(), R.string.duplicate_item, Snackbar.LENGTH_SHORT).show();
             }
             catch( Exception ex )
@@ -175,21 +178,12 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
         Vibrator vibrator = (Vibrator) getContext().getSystemService(VIBRATOR_SERVICE);
         if ( vibrator != null ) vibrator.vibrate(50);
 
-        deleted_position = position;
-        deleted_item = items.get(position);
-        items.remove(position);
-        adapter.notifyDataSetChanged();
+        item_adapter.remove(position);
 
         View.OnClickListener undo_callback = new View.OnClickListener()
         {
             @Override
-            public void onClick(View v)
-            {
-                if ( deleted_item == null ) return;
-                items.add( deleted_position, deleted_item );
-                deleted_item = null;
-                adapter.notifyDataSetChanged();
-            }
+            public void onClick(View v) { item_adapter.undoRemove(); }
         };
 
         Snackbar snackbar = Snackbar.make( getView(), R.string.item_deleted, Snackbar.LENGTH_SHORT);

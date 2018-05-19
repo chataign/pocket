@@ -38,13 +38,16 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.fchataigner.pocket.R;
+import com.example.fchataigner.pocket.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Activity for the multi-tracker app.  This app detects text and displays the value with the
@@ -321,16 +324,16 @@ public final class OcrCaptureActivity extends AppCompatActivity
             return false;
         }
 
-        TextBlock text = graphic.getTextBlock();
+        TextBlock text_block = graphic.getTextBlock();
 
-        if (text == null || text.getValue() == null)
+        if ( text_block == null )
         {
             Log.w(TAG, "text data is null");
             return false;
         }
 
         Intent data = new Intent();
-        data.putExtra(TextBlockObject, text.getValue());
+        data.putStringArrayListExtra( TextBlockObject, Utils.getStrings(text_block) );
         setResult(CommonStatusCodes.SUCCESS, data);
         finish();
 

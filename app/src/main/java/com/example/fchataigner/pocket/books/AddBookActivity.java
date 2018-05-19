@@ -31,7 +31,7 @@ import java.util.Collections;
 public class AddBookActivity extends AppCompatActivity
         implements
         SearchView.OnQueryTextListener,
-        BookFinder.OnBookResultsListener,
+        BookFinder.Listener,
         ListView.OnItemClickListener
 {
     static private String TAG = "AddBookActivity";
@@ -114,7 +114,7 @@ public class AddBookActivity extends AppCompatActivity
     }
 
     @Override
-    public void onBookResults( @NonNull ArrayList<Book> books )
+    public void onResults( @NonNull ArrayList<Book> books )
     {
         ProgressBar progress_bar = findViewById(R.id.progress_bar);
         progress_bar.setVisibility(View.INVISIBLE);
