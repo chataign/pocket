@@ -58,6 +58,13 @@ public final class Utils
         return str;
     }
 
+    static public String join( String[] strings, String delimiter )
+    {
+        ArrayList<String> string_array = new ArrayList<>();
+        for ( String string : strings ) string_array.add(string);
+        return join( string_array, delimiter );
+    }
+
     static public ArrayList<String> getStrings( TextBlock block )
     {
         ArrayList<String> strings = new ArrayList<>();

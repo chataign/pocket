@@ -69,8 +69,8 @@ public class AddPlaceActivity extends AddLocalizedItemActivity<Place>
         String place_type = (String) type_spinner.getSelectedItem();
 
         if ( place_finder != null ) place_finder.cancel(true);
-        place_finder = new PlaceFinder( this, this, location, search_radius, place_type, query );
-        place_finder.execute();
+        place_finder = new PlaceFinder( this, location, search_radius, place_type, this );
+        place_finder.execute( query );
 
         return true;
     }
