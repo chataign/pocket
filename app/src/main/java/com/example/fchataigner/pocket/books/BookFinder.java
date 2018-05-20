@@ -13,25 +13,22 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.fchataigner.pocket.Language;
+import com.example.fchataigner.pocket.interfaces.AsyncResultsListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class BookFinder extends AsyncTask< String, Void, ArrayList<Book> >
         implements Response.ErrorListener, Response.Listener<JSONObject>
 {
     private static String TAG = "BookFinder";
 
-    public interface Listener
-    {
-        void onResults( ArrayList<Book> books );
-    }
-
     Language language;
     String type;
-    Listener listener;
+    AsyncResultsListener<Book> listener;
     RequestQueue requestQueue;
     ArrayList<Book> books;
     String base_url;
@@ -40,7 +37,7 @@ public class BookFinder extends AsyncTask< String, Void, ArrayList<Book> >
     public BookFinder(@NonNull Context context,
                       @NonNull Language language,
                       @NonNull String type,
-                      @NonNull Listener listener )
+                      @NonNull AsyncResultsListener<Book> listener )
     {
         this.language = language;
         this.type = type;
@@ -115,5 +112,11 @@ public class BookFinder extends AsyncTask< String, Void, ArrayList<Book> >
     }
 
     protected void onPreExecute() {}
-    protected void onPostExecute( ArrayList<Book> books ) { listener.onResults(books); }
+
+    protected void onPostExecute( ArrayList<Book> books )
+    {
+        Collections.sort( books, Book.OrderByRating );
+        listener.onNewResults(books);
+        listener.onPostExecute();
+    }
 }

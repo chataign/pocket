@@ -7,7 +7,6 @@ public interface Displayable
 {
     void createDetailsView( Context context, View view );
 
-    int getItemLayout();
     int getDetailsLayout();
     int getFileResource();
 

@@ -1,13 +1,10 @@
 package com.example.fchataigner.pocket;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -67,9 +64,9 @@ public final class Utils
 
         for ( Text text : block.getComponents() )
         {
-            List<? extends Text> subtexts = text.getComponents();
-            if ( subtexts.size() == 1 ) strings.add( text.getValue() );
-            else for ( Text subtext : subtexts ) strings.add( subtext.getValue() );
+            List<? extends Text> components = text.getComponents();
+            if ( components.size() <= 1 ) strings.add( text.getValue() );
+            else for ( Text component : components ) strings.add( component.getValue() );
         }
 
         return strings;

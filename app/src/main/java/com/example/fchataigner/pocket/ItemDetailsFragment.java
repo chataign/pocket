@@ -2,6 +2,7 @@ package com.example.fchataigner.pocket;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,7 +19,7 @@ public class ItemDetailsFragment<Item extends Displayable & Shareable> extends F
     private Item item = null;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         Bundle args = this.getArguments();
         String bundle_item = getContext().getString(R.string.bundle_item);

@@ -13,6 +13,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.fchataigner.pocket.interfaces.AsyncResultsListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,12 +24,6 @@ import java.util.LinkedList;
 public class PlaceFinder extends AsyncTask< Void, Void, Void >
         implements Response.ErrorListener, Response.Listener<JSONObject>
 {
-    public interface Listener
-    {
-        void onNewResults(ArrayList<Place> places);
-        void onPostExecute();
-    }
-
     class DelayedRequest
     {
         JsonObjectRequest request;
@@ -54,7 +49,7 @@ public class PlaceFinder extends AsyncTask< Void, Void, Void >
         }
     }
 
-    private Listener listener;
+    private AsyncResultsListener<Place> listener;
     private RequestQueue request_queue;
     private String base_url, api_key;
     private boolean request_running=false;
@@ -68,7 +63,7 @@ public class PlaceFinder extends AsyncTask< Void, Void, Void >
     private static String TAG = "PlaceFinder";
     private static long REQUEST_DELAY_MS = 2000;
 
-    public PlaceFinder(Context context, @NonNull Listener listener,
+    public PlaceFinder(Context context, @NonNull AsyncResultsListener<Place> listener,
                        @NonNull Location location, int search_radius, String place_type, String search_string )
     {
         this.listener = listener;

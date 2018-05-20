@@ -58,7 +58,8 @@ public final class OcrCaptureActivity extends AppCompatActivity
 {
     private static final String TAG = "OcrCaptureActivity";
 
-    public static final int GET_TEXT = 111;
+    public static final int OCR_GET_TEXT= 111;
+    public static final String OCR_TEXT_RESULT= "OCR_TEXT_RESULT";
 
     // Intent request code to handle updating play services if needed.
     private static final int RC_HANDLE_GMS = 9001;
@@ -69,7 +70,6 @@ public final class OcrCaptureActivity extends AppCompatActivity
     // Constants used to pass extra data in the intent
     public static final String AutoFocus = "AutoFocus";
     public static final String UseFlash = "UseFlash";
-    public static final String TextBlockObject = "String";
 
     private CameraSource camera_source;
     private CameraSourcePreview camera_preview;
@@ -333,7 +333,7 @@ public final class OcrCaptureActivity extends AppCompatActivity
         }
 
         Intent data = new Intent();
-        data.putStringArrayListExtra( TextBlockObject, Utils.getStrings(text_block) );
+        data.putStringArrayListExtra( OCR_TEXT_RESULT, Utils.getStrings(text_block) );
         setResult(CommonStatusCodes.SUCCESS, data);
         finish();
 

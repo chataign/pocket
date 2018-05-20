@@ -149,7 +149,7 @@ public class Book implements Parcelable, JSONable, Listable, Displayable, Sharea
             Log.w( "Book", "failed to parse date, error=" + ex.getMessage() );
         }
 
-        Button button = (Button) view.findViewById(R.id.button);
+        Button button = view.findViewById(R.id.button);
         button.setOnClickListener( new Button.OnClickListener()
         {
             @Override

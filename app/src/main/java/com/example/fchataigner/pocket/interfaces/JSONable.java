@@ -9,8 +9,8 @@ public interface JSONable
     JSONObject writeJSON() throws JSONException;
     Builder getBuilder();
 
-    interface Builder
+    interface Builder<Item>
     {
-        Object buildFromJSON( JSONObject json ) throws JSONException;
+        Item buildFromJSON( JSONObject json ) throws JSONException;
     }
 }

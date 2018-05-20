@@ -13,4 +13,10 @@
         <item>clothing_store</item>
         <item>bakery</item>
     </string-array>
+
+    <string-array name="book_types">
+        <item>books</item>
+        <item>magazines</item>
+        <item>all</item>
+    </string-array>
 </resources>

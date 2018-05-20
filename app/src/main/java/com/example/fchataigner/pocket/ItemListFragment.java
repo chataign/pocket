@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -30,20 +31,19 @@ import static android.content.Context.VIBRATOR_SERVICE;
 public class ItemListFragment<Item extends Listable & Displayable & JSONable & Parcelable & Shareable>
         extends Fragment
         implements
-        AsyncFileReader.Listener<Item>,
         ListView.OnItemClickListener,
         ListView.OnItemLongClickListener
 {
     public final int REQUEST_ADD_ITEM = 1;
     public final String TAG = "ItemListFragment";
 
-    private ItemListAdapter<Item> item_adapter = null;
+    private ItemListAdapter<Item> list_adapter = null;
     private Item base_item=null;
 
     public ItemListFragment() {}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         setHasOptionsMenu(true);
 
@@ -52,12 +52,18 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
         this.base_item = (Item) args.getParcelable(bundle_item);
 
         String items_file = getContext().getString( base_item.getFileResource() );
-        JSONable.Builder builder = base_item.getBuilder();
+        JSONable.Builder<Item> builder = base_item.getBuilder();
 
-        AsyncFileReader<Item> file_reader = new AsyncFileReader<>( getContext(), builder, this );
+        list_adapter = new ItemListAdapter<Item>( getContext(), new ArrayList<Item>(), base_item.getItemLayout() );
+
+        AsyncFileReader<Item> file_reader = new AsyncFileReader<>(
+                getContext(), builder, new AsyncFileReader.Listener<Item>()
+        {
+            @Override
+            public void onResult(ArrayList<Item> items) { list_adapter.addAll(items); }
+        } );
+
         file_reader.execute(items_file);
-
-        item_adapter = new ItemListAdapter<Item>( getContext(), new ArrayList<Item>(), base_item.getItemLayout() );
 
         return inflater.inflate(R.layout.itemlist_fragment, container, false);
     }
@@ -67,8 +73,9 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
     {
         super.onStart();
 
-        ListView list = (ListView) getView().findViewById(R.id.list);
-        list.setAdapter( item_adapter );
+        ListView list = getView().findViewById(R.id.list);
+        list.setEmptyView( getView().findViewById( R.id.empty_list_view ) );
+        list.setAdapter( list_adapter );
         list.setOnItemClickListener(this);
         list.setOnItemLongClickListener(this);
 
@@ -91,7 +98,7 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
     {
         String items_file = getContext().getString( base_item.getFileResource() );
         AsyncFileSaver<Item> file_saver = new AsyncFileSaver<>( getContext(), items_file, null );
-        file_saver.execute( item_adapter.getItems() );
+        file_saver.execute( list_adapter.getItems() );
 
         super.onStop();
     }
@@ -117,13 +124,6 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
     }
 
     @Override
-    public void onResult( ArrayList<Item> items )
-    {
-        item_adapter.addAll(items);
-        item_adapter.notifyDataSetChanged();
-    }
-
-    @Override
     public void onActivityResult( int request, int result, Intent intent )
     {
         if ( request == REQUEST_ADD_ITEM && result == Activity.RESULT_OK )
@@ -131,18 +131,17 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
             try
             {
                 String bundle_item = getContext().getString(R.string.bundle_item);
-                Bundle bundle = intent.getExtras();
-                Item new_item = bundle.getParcelable(bundle_item);
+                Item new_item = intent.getParcelableExtra(bundle_item);
 
                 boolean item_exists=false;
 
-                for ( Item item : item_adapter.getItems() )
+                for ( Item item : list_adapter.getItems() )
                     if ( new_item.equals(item) ) { item_exists=true; break; }
 
                 if ( !item_exists )
                 {
-                    item_adapter.insert(new_item, 0); // add to top of the list
-                    item_adapter.notifyDataSetChanged();
+                    list_adapter.insert(new_item, 0); // add to top of the list
+                    list_adapter.notifyDataSetChanged();
                     Log.i( TAG, "added item=" + new_item.toString() );
                 }
                 else Snackbar.make( getView(), R.string.duplicate_item, Snackbar.LENGTH_SHORT).show();
@@ -178,15 +177,15 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
         Vibrator vibrator = (Vibrator) getContext().getSystemService(VIBRATOR_SERVICE);
         if ( vibrator != null ) vibrator.vibrate(50);
 
-        item_adapter.remove(position);
+        list_adapter.remove(position);
 
         View.OnClickListener undo_callback = new View.OnClickListener()
         {
             @Override
-            public void onClick(View v) { item_adapter.undoRemove(); }
+            public void onClick(View v) { list_adapter.undoRemove(); }
         };
 
-        Snackbar snackbar = Snackbar.make( getView(), R.string.item_deleted, Snackbar.LENGTH_SHORT);
+        Snackbar snackbar = Snackbar.make( getView(), R.string.item_deleted, Snackbar.LENGTH_LONG);
         snackbar.setAction(R.string.undo, undo_callback );
         snackbar.show();
 
