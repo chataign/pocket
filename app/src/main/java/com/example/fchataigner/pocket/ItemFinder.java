@@ -21,7 +21,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class ItemFinder<Item> extends AsyncTask< String, Void, Void >
-        implements Response.ErrorListener, Response.Listener<JSONObject>
+        implements
+        Response.ErrorListener,
+        Response.Listener<JSONObject>
 {
     protected abstract String createQueryUrl( String[] search_strings, String next_page_token );
     protected abstract List<Item> parseResponse(JSONObject response ) throws JSONException;
@@ -58,6 +60,8 @@ public abstract class ItemFinder<Item> extends AsyncTask< String, Void, Void >
     private String[] search_strings=null;
 
     protected static String TAG = "ItemFinder";
+
+    private static long REQUEST_WAIT_MS = 100;
     private static long REQUEST_DELAY_MS = 2000;
 
     public ItemFinder(Context context, @NonNull AsyncResultsListener<Item> listener )
@@ -113,20 +117,18 @@ public abstract class ItemFinder<Item> extends AsyncTask< String, Void, Void >
 
         while (!isCancelled())
         {
-            if (request_running) { SystemClock.sleep(100); continue; }
-            else if (delayed_requests.isEmpty()) break;
+            if (request_running) { SystemClock.sleep(REQUEST_WAIT_MS); continue; }
+            else if ( delayed_requests.isEmpty() ) break; // we're done
 
             DelayedRequest next_request = delayed_requests.getFirst();
+            if ( !next_request.isReady() ) { SystemClock.sleep(REQUEST_WAIT_MS); continue; }
 
-            if ( next_request.isReady() )
-            {
-                Log.i(TAG, String.format("starting request after %.2f seconds, url=%s",
-                        next_request.elapsed() / 1000.0, next_request.request.getUrl() ) );
+            Log.i(TAG, String.format("starting request after %.2f seconds, url=%s",
+                    next_request.elapsed() / 1000.0, next_request.request.getUrl() ) );
 
-                request_running = true;
-                request_queue.add( next_request.request );
-                delayed_requests.removeFirst();
-            }
+            request_running = true;
+            request_queue.add( next_request.request );
+            delayed_requests.removeFirst();
         }
 
         return null;
@@ -139,7 +141,7 @@ public abstract class ItemFinder<Item> extends AsyncTask< String, Void, Void >
         request_queue.stop();
         request_running=false;
 
-        Log.i( TAG, "onCancelled" );
+        Log.i( TAG, "cancelled" );
         super.onCancelled();
     }
 

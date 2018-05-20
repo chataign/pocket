@@ -19,7 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.example.fchataigner.pocket.interfaces.Displayable;
+import com.example.fchataigner.pocket.interfaces.Detailable;
 import com.example.fchataigner.pocket.interfaces.JSONable;
 import com.example.fchataigner.pocket.interfaces.Listable;
 import com.example.fchataigner.pocket.interfaces.Shareable;
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 
-public class ItemListFragment<Item extends Listable & Displayable & JSONable & Parcelable & Shareable>
+public abstract class ItemListFragment<Item extends Listable & Detailable & JSONable & Parcelable & Shareable>
         extends Fragment
         implements
         ListView.OnItemClickListener,
@@ -38,7 +38,11 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
     public final String TAG = "ItemListFragment";
 
     private ItemListAdapter<Item> list_adapter = null;
-    private Item base_item=null;
+
+    protected abstract int getFileResource();
+    protected abstract int getItemListLayout();
+    protected abstract Class<?> getAddItemActivity();
+    protected abstract JSONable.Builder<Item> getBuilder();
 
     public ItemListFragment() {}
 
@@ -47,17 +51,12 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
     {
         setHasOptionsMenu(true);
 
-        Bundle args = getArguments();
-        String bundle_item = getContext().getString(R.string.bundle_item);
-        this.base_item = (Item) args.getParcelable(bundle_item);
+        String items_file = getContext().getString( getFileResource() );
 
-        String items_file = getContext().getString( base_item.getFileResource() );
-        JSONable.Builder<Item> builder = base_item.getBuilder();
-
-        list_adapter = new ItemListAdapter<Item>( getContext(), new ArrayList<Item>(), base_item.getItemLayout() );
+        list_adapter = new ItemListAdapter<Item>( getContext(), new ArrayList<Item>(), getItemListLayout() );
 
         AsyncFileReader<Item> file_reader = new AsyncFileReader<>(
-                getContext(), builder, new AsyncFileReader.Listener<Item>()
+                getContext(), getBuilder(), new AsyncFileReader.Listener<Item>()
         {
             @Override
             public void onResult(ArrayList<Item> items) { list_adapter.addAll(items); }
@@ -85,9 +84,7 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
             @Override
             public void onClick(View view)
             {
-                String bundle_item = getContext().getString(R.string.bundle_item);
-                Intent intent = new Intent( getActivity(), base_item.getAddItemClass() );
-                intent.putExtra( bundle_item, base_item );
+                Intent intent = new Intent( getActivity(), getAddItemActivity() );
                 startActivityForResult( intent, REQUEST_ADD_ITEM );
             }
         });
@@ -96,7 +93,7 @@ public class ItemListFragment<Item extends Listable & Displayable & JSONable & P
     @Override
     public void onStop()
     {
-        String items_file = getContext().getString( base_item.getFileResource() );
+        String items_file = getContext().getString( getFileResource() );
         AsyncFileSaver<Item> file_saver = new AsyncFileSaver<>( getContext(), items_file, null );
         file_saver.execute( list_adapter.getItems() );
 

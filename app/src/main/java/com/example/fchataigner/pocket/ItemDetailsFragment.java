@@ -11,10 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.fchataigner.pocket.interfaces.Displayable;
+import com.example.fchataigner.pocket.interfaces.Detailable;
 import com.example.fchataigner.pocket.interfaces.Shareable;
 
-public class ItemDetailsFragment<Item extends Displayable & Shareable> extends Fragment
+public class ItemDetailsFragment<Item extends Detailable & Shareable> extends Fragment
 {
     private Item item = null;
 

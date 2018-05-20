@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.fchataigner.pocket.R;
-import com.example.fchataigner.pocket.interfaces.Displayable;
+import com.example.fchataigner.pocket.interfaces.Detailable;
 import com.example.fchataigner.pocket.interfaces.JSONable;
 import com.example.fchataigner.pocket.interfaces.Listable;
 import com.example.fchataigner.pocket.interfaces.Shareable;
@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class Place implements Parcelable, JSONable, Listable, Displayable, Shareable
+public class Place implements Parcelable, JSONable, Listable, Detailable, Shareable
 {
     public String place_id;
     public String name;
@@ -60,12 +60,6 @@ public class Place implements Parcelable, JSONable, Listable, Displayable, Share
 
     @Override
     public int getItemLayout() { return R.layout.place_item; }
-
-    @Override
-    public int getFileResource() { return R.string.places_file; }
-
-    @Override
-    public Class<?> getAddItemClass() { return AddPlaceActivity.class; }
 
     @Override
     public void createListView( View view )

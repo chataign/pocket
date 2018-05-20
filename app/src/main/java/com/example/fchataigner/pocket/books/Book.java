@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.fchataigner.pocket.R;
-import com.example.fchataigner.pocket.interfaces.Displayable;
+import com.example.fchataigner.pocket.interfaces.Detailable;
 import com.example.fchataigner.pocket.interfaces.JSONable;
 import com.example.fchataigner.pocket.interfaces.Listable;
 import com.example.fchataigner.pocket.interfaces.Shareable;
@@ -26,12 +26,11 @@ import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 
-public class Book implements Parcelable, JSONable, Listable, Displayable, Shareable
+public class Book implements Parcelable, JSONable, Listable, Detailable, Shareable
 {
     public String isbn_13;
     public String isbn_10;
@@ -67,12 +66,6 @@ public class Book implements Parcelable, JSONable, Listable, Displayable, Sharea
 
     @Override
     public int getItemLayout() { return R.layout.book_item; }
-
-    @Override
-    public int getFileResource() { return R.string.books_file; }
-
-    @Override
-    public Class<?> getAddItemClass() { return AddBookActivity.class; }
 
     public String getMonth() throws ParseException
     {

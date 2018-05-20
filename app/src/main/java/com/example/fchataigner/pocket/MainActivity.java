@@ -10,7 +10,9 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.fchataigner.pocket.books.Book;
+import com.example.fchataigner.pocket.books.BookListFragment;
 import com.example.fchataigner.pocket.places.Place;
+import com.example.fchataigner.pocket.places.PlaceListFragment;
 
 public class MainActivity extends AppCompatActivity
         implements BottomNavigationView.OnNavigationItemSelectedListener
@@ -20,25 +22,19 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment=null;
         String title="";
 
-        Bundle args = new Bundle();
-        String bundle_item = getApplicationContext().getString(R.string.bundle_item);
-
         switch( item_id )
         {
             case R.id.item_book:
                 title = getString(R.string.category_books);
-                args.putParcelable(bundle_item, new Book() );
-                fragment = new ItemListFragment<Book>();
+                fragment = new BookListFragment();
                 break;
             case R.id.item_food:
                 title = getString(R.string.item_food);
-                args.putParcelable(bundle_item, new Place() );
-                fragment = new ItemListFragment<Place>();
+                fragment = new PlaceListFragment();
                 break;
             case R.id.item_shop:
                 title = getString(R.string.category_shops);
-                args.putParcelable(bundle_item, new Place() );
-                fragment = new ItemListFragment<Place>();
+                fragment = new PlaceListFragment();
                 break;
             case R.id.item_event:
                 title = getString(R.string.category_events);
@@ -52,7 +48,6 @@ public class MainActivity extends AppCompatActivity
             return false;
         }
 
-        fragment.setArguments(args);
         getSupportActionBar().setTitle(title);
 
         getSupportFragmentManager()
