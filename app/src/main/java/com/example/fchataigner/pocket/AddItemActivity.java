@@ -54,6 +54,7 @@ public abstract class AddItemActivity<Item extends Parcelable & Listable> extend
 
     public abstract void setupSearchInterface();
     public abstract boolean startSearch( String query );
+    public abstract void stopSearch();
 
     private ItemListAdapter<Item> list_adapter;
 
@@ -95,6 +96,13 @@ public abstract class AddItemActivity<Item extends Parcelable & Listable> extend
     }
 
     @Override
+    public void onStop()
+    {
+        stopSearch();
+        super.onStop();
+    }
+
+    @Override
     public boolean onQueryTextChange( String query )
     {
         return true;
@@ -123,6 +131,7 @@ public abstract class AddItemActivity<Item extends Parcelable & Listable> extend
     public void onNewResults( @NonNull List<Item> new_items )
     {
         list_adapter.addAll(new_items);
+        list_adapter.notifyDataSetChanged();
         // TODO sort items
 
         TextView info_text = getInfoView();
@@ -152,6 +161,9 @@ public abstract class AddItemActivity<Item extends Parcelable & Listable> extend
     @Override
     public void onActivityResult( int request, int result, Intent intent )
     {
+        if ( intent == null )
+            return;
+
         if ( request == OcrCaptureActivity.OCR_GET_TEXT && result == CommonStatusCodes.SUCCESS )
         {
             ArrayList<String> ocr_strings = intent.getStringArrayListExtra( OcrCaptureActivity.OCR_TEXT_RESULT );

@@ -15,10 +15,8 @@ import java.util.List;
 
 public class ItemListAdapter<Item extends Listable> extends ArrayAdapter<Item>
 {
-    private Context context;
-    private List<Item> items;
-    private int layout_resource;
-
+    Context context;
+    int layout_resource;
     int removed_position;
     Item removed_item=null;
 
@@ -27,21 +25,15 @@ public class ItemListAdapter<Item extends Listable> extends ArrayAdapter<Item>
         super( context, 0 , items );
 
         this.context = context;
-        this.items = items;
         this.layout_resource = layout_resource;
-     }
-
-    public Item get( int position )
-    {
-        return items.get(position);
     }
 
     public void remove( int position )
     {
-        removed_item = items.get(position);
+        removed_item = getItem(position);
         removed_position=position;
 
-        items.remove(position);
+        super.remove(removed_item);
         notifyDataSetChanged();
     }
 
@@ -50,17 +42,13 @@ public class ItemListAdapter<Item extends Listable> extends ArrayAdapter<Item>
         if ( removed_item == null ) return;
         this.insert( removed_item, removed_position );
         removed_item = null;
-    }
-
-    public List<Item> getItems()
-    {
-        return items;
+        notifyDataSetChanged();
     }
 
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
     {
-        Item item = items.get(position);
+        Item item = getItem(position);
         View view = convertView;
 
         if(view == null)

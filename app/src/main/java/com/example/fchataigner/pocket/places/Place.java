@@ -155,7 +155,6 @@ public class Place implements Parcelable, JSONable, Listable, Detailable, Sharea
 
         GetPlaceDetails get_place_details = new GetPlaceDetails( context, details_received );
         get_place_details.execute( this );
-
     }
 
     @Override

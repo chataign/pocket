@@ -4,6 +4,8 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -19,11 +21,10 @@ public class MainActivity extends AppCompatActivity
 {
     private boolean loadFragment( int item_id )
     {
-        Fragment fragment=null;
-        String title="";
+        Fragment fragment = null;
+        String title = "";
 
-        switch( item_id )
-        {
+        switch (item_id) {
             case R.id.item_book:
                 title = getString(R.string.category_books);
                 fragment = new BookListFragment();
@@ -42,19 +43,19 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
 
-        if (fragment == null)
-        {
-            Log.e( "MainActivity", "null fragment, id=" + item_id );
+        if (fragment == null) {
+            Log.e("MainActivity", "null fragment, id=" + item_id);
             return false;
         }
 
         getSupportActionBar().setTitle(title);
 
         getSupportFragmentManager()
-                .beginTransaction()
-                .replace( R.id.fragment_container, fragment )
-                .addToBackStack(null)
-                .commit();
+            .beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            //.addToBackStack(null)
+            .commit();
+
         return true;
     }
 

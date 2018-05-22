@@ -78,4 +78,10 @@ public class AddBookActivity extends AddItemActivity<Book>
 
         return true;
     }
+
+    @Override
+    public void stopSearch()
+    {
+        if ( book_finder != null ) book_finder.cancel(true);
+    }
 }

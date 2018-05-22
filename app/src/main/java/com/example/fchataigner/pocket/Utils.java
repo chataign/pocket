@@ -1,14 +1,21 @@
 package com.example.fchataigner.pocket;
 
 import android.content.Context;
+import android.os.SystemClock;
+import android.util.Log;
 
+import com.example.fchataigner.pocket.interfaces.JSONable;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONTokener;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +50,44 @@ public final class Utils
         OutputStreamWriter writer = new OutputStreamWriter(file);
         writer.write( string );
         writer.close();
+    }
+
+    static <Item extends JSONable>
+    List<Item> readFromFile( Context context, String filename, JSONable.Builder<Item> builder )
+        throws JSONException, IOException
+    {
+        long start_time = SystemClock.currentThreadTimeMillis();
+        ArrayList<Item> items = new ArrayList<>();
+
+        String json_str = Utils.readString( context, filename );
+        JSONArray json = (JSONArray) new JSONTokener(json_str).nextValue();
+
+        for ( int i=0; i< json.length(); ++i )
+            items.add( builder.buildFromJSON( json.getJSONObject(i) ) );
+
+        long time_now = SystemClock.currentThreadTimeMillis();
+
+        Log.i( "readFromFile", String.format( "read %d items from file='%s' in %dms",
+                items.size(), filename, time_now - start_time ) );
+
+        return items;
+    }
+
+    static <Item extends JSONable>
+    void writeToFile( Context context, String filename, List<Item> items )
+            throws JSONException, IOException
+    {
+        long start_time = SystemClock.currentThreadTimeMillis();
+
+        JSONArray json = new JSONArray();
+            for ( JSONable item : items ) json.put( item.writeJSON() );
+
+        Utils.writeString( json.toString(), context, filename );
+
+        long time_now = SystemClock.currentThreadTimeMillis();
+
+        Log.i( "writeToFile", String.format( "wrote %d items to file='%s' in %dms",
+                items.size(), filename, time_now - start_time ) );
     }
 
     static public String join( List<String> strings, String delimiter )

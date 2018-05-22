@@ -58,8 +58,11 @@ public class Book implements Parcelable, JSONable, Listable, Detailable, Shareab
     public Book() {}
 
     @Override
-    public String getShareableString() { return String.format(
-            "Check out this book: \"%s\" by %s", this.title, this.author ); }
+    public String getShareableString() 
+    {
+        return String.format(
+            "Check out this book: \"%s\" by %s", this.title, this.author ); 
+    }
 
     @Override
     public int getDetailsLayout() { return R.layout.book_details; }

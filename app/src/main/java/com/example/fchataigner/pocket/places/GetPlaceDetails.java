@@ -53,7 +53,7 @@ public class GetPlaceDetails extends AsyncTask<Place, Void, PlaceDetails>
     public void onErrorResponse( VolleyError error )
     {
         Log.e( TAG, "VolleyError=" + error.toString() );
-        //this.cancel(true);
+        this.cancel(true);
     }
 
     protected PlaceDetails doInBackground( Place... places )
@@ -74,10 +74,20 @@ public class GetPlaceDetails extends AsyncTask<Place, Void, PlaceDetails>
         request_queue.add(request);
         request_running=true;
 
-        while( request_running )
+        while( !isCancelled() && request_running )
             SystemClock.sleep(100 );
 
         return details;
+    }
+
+    @Override
+    protected void onCancelled()
+    {
+        request_queue.stop();
+        request_running=false;
+
+        Log.i( TAG, "cancelled" );
+        super.onCancelled();
     }
 
     protected void onPreExecute() {}

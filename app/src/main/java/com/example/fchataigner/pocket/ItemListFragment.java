@@ -38,6 +38,7 @@ public abstract class ItemListFragment<Item extends Listable & Detailable & JSON
     public final String TAG = "ItemListFragment";
 
     private ItemListAdapter<Item> list_adapter = null;
+    private ItemsFile<Item> item_file=null;
 
     protected abstract int getFileResource();
     protected abstract int getItemListLayout();
@@ -53,8 +54,12 @@ public abstract class ItemListFragment<Item extends Listable & Detailable & JSON
 
         String items_file = getContext().getString( getFileResource() );
 
-        list_adapter = new ItemListAdapter<Item>( getContext(), new ArrayList<Item>(), getItemListLayout() );
+        item_file = new ItemsFile<Item>( getContext(), getFileResource(), getBuilder() );
 
+        list_adapter = new ItemListAdapter<Item>( getContext(), new ArrayList<Item>(), getItemListLayout() );
+        list_adapter.addAll( item_file.getItems() );
+
+        /*
         AsyncFileReader<Item> file_reader = new AsyncFileReader<>(
                 getContext(), getBuilder(), new AsyncFileReader.Listener<Item>()
         {
@@ -63,6 +68,7 @@ public abstract class ItemListFragment<Item extends Listable & Detailable & JSON
         } );
 
         file_reader.execute(items_file);
+        */
 
         return inflater.inflate(R.layout.itemlist_fragment, container, false);
     }
@@ -93,9 +99,9 @@ public abstract class ItemListFragment<Item extends Listable & Detailable & JSON
     @Override
     public void onStop()
     {
-        String items_file = getContext().getString( getFileResource() );
-        AsyncFileSaver<Item> file_saver = new AsyncFileSaver<>( getContext(), items_file, null );
-        file_saver.execute( list_adapter.getItems() );
+        //String items_file = getContext().getString( getFileResource() );
+        //AsyncFileSaver<Item> file_saver = new AsyncFileSaver<>( getContext(), items_file, null );
+        //file_saver.execute( list_adapter.getItems() );
 
         super.onStop();
     }
@@ -132,13 +138,14 @@ public abstract class ItemListFragment<Item extends Listable & Detailable & JSON
 
                 boolean item_exists=false;
 
-                for ( Item item : list_adapter.getItems() )
-                    if ( new_item.equals(item) ) { item_exists=true; break; }
+                for ( int i=0; i< list_adapter.getCount(); ++i )
+                    if ( list_adapter.getItem(i).equals(new_item) ) { item_exists=true; break; }
 
                 if ( !item_exists )
                 {
                     list_adapter.insert(new_item, 0); // add to top of the list
                     list_adapter.notifyDataSetChanged();
+                    item_file.insert(new_item);
                     Log.i( TAG, "added item=" + new_item.toString() );
                 }
                 else Snackbar.make( getView(), R.string.duplicate_item, Snackbar.LENGTH_SHORT).show();
@@ -174,12 +181,19 @@ public abstract class ItemListFragment<Item extends Listable & Detailable & JSON
         Vibrator vibrator = (Vibrator) getContext().getSystemService(VIBRATOR_SERVICE);
         if ( vibrator != null ) vibrator.vibrate(50);
 
+        final Item removed = (Item) list.getItemAtPosition(position);
+
         list_adapter.remove(position);
+        item_file.delete(removed);
 
         View.OnClickListener undo_callback = new View.OnClickListener()
         {
             @Override
-            public void onClick(View v) { list_adapter.undoRemove(); }
+            public void onClick(View v)
+            {
+                list_adapter.undoRemove();
+                item_file.insert( removed );
+            }
         };
 
         Snackbar snackbar = Snackbar.make( getView(), R.string.item_deleted, Snackbar.LENGTH_LONG);

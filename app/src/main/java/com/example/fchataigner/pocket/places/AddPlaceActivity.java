@@ -74,4 +74,10 @@ public class AddPlaceActivity extends AddLocalizedItemActivity<Place>
 
         return true;
     }
+
+    @Override
+    public void stopSearch()
+    {
+        if ( place_finder != null ) place_finder.cancel(true);
+    }
 }

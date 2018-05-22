@@ -27,7 +27,7 @@ public class PlaceFinder extends ItemFinder<Place>
                 @NonNull Location location,
                 int search_radius,
                 String place_type,
-                @NonNull AsyncResultsListener<Place> listener )
+                @NonNull AsyncResultsListener<Place> listener)
     {
         super( context, listener );
 
