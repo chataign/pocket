@@ -10,7 +10,7 @@
         android:id="@+id/book_find_list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/ic_bookmark_white_48px"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

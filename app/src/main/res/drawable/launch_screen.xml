@@ -5,10 +5,9 @@
     <!-- Your product logo - 144dp color version of your app icon -->
     <item
         android:gravity="center_vertical|center"
-        android:width="200dp"
-        android:height="200dp">
+        android:width="100dp"
+        android:height="100dp"
+        android:drawable="@drawable/ic_bookmark_white_48px">
 
-        <bitmap
-            android:src="@mipmap/ic_pocket"/>
     </item>
 </layer-list>
