@@ -5,19 +5,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.example.fchataigner.pocket.books.Book;
 import com.example.fchataigner.pocket.books.BookListFragment;
-import com.example.fchataigner.pocket.places.Place;
 import com.example.fchataigner.pocket.places.PlaceListFragment;
 
 public class MainActivity extends AppCompatActivity
-        implements BottomNavigationView.OnNavigationItemSelectedListener
 {
     private boolean loadFragment( int item_id )
     {
@@ -50,19 +46,18 @@ public class MainActivity extends AppCompatActivity
 
         getSupportActionBar().setTitle(title);
 
-        getSupportFragmentManager()
+        FragmentManager fragment_manager = getSupportFragmentManager();
+
+        fragment_manager
+            .popBackStack( null, FragmentManager.POP_BACK_STACK_INCLUSIVE );
+
+        fragment_manager
             .beginTransaction()
             .replace(R.id.fragment_container, fragment)
             //.addToBackStack(null)
             .commit();
 
         return true;
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item)
-    {
-        return loadFragment( item.getItemId() );
     }
 
     @Override
@@ -78,7 +73,12 @@ public class MainActivity extends AppCompatActivity
         //getSupportActionBar().setIcon(R.mipmap.ic_pocket);
 
         BottomNavigationView navigation = findViewById(R.id.bottom_navigation);
-        navigation.setOnNavigationItemSelectedListener(this);
+        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                return loadFragment( item.getItemId() );
+            }
+        });
 
         loadFragment( R.id.item_book );
     }
