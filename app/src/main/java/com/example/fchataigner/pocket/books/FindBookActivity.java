@@ -8,13 +8,13 @@ import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.fchataigner.pocket.AddItemActivity;
+import com.example.fchataigner.pocket.FindtemActivity;
 import com.example.fchataigner.pocket.Language;
 import com.example.fchataigner.pocket.R;
 
 import java.util.ArrayList;
 
-public class AddBookActivity extends AddItemActivity<Book>
+public class FindBookActivity extends FindtemActivity<Book>
 {
     private BookFinder book_finder=null;
 

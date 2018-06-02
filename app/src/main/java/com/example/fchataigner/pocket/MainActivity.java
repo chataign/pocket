@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
 
         fragment_manager
             .beginTransaction()
-            .replace(R.id.fragment_container, fragment)
+            .replace(R.id.fragment_container, fragment, title )
             //.addToBackStack(null)
             .commit();
 

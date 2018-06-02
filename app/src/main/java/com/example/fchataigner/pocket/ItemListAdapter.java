@@ -37,12 +37,13 @@ public class ItemListAdapter<Item extends Listable> extends ArrayAdapter<Item>
         notifyDataSetChanged();
     }
 
-    public void undoRemove()
+    public int undoRemove()
     {
-        if ( removed_item == null ) return;
+        if ( removed_item == null ) return -1;
         this.insert( removed_item, removed_position );
         removed_item = null;
         notifyDataSetChanged();
+        return removed_position;
     }
 
     @Override

@@ -34,7 +34,8 @@ public abstract class ItemListFragment<Item extends Listable & Detailable & JSON
         ListView.OnItemClickListener,
         ListView.OnItemLongClickListener
 {
-    public final int REQUEST_ADD_ITEM = 1;
+    public final static int ADD_ITEM = 1;
+    public final static String ADD_ITEM_EXTRA = "add_item_extra";
     public final String TAG = "ItemListFragment";
 
     private ItemListAdapter<Item> list_adapter = null;
@@ -52,24 +53,7 @@ public abstract class ItemListFragment<Item extends Listable & Detailable & JSON
     {
         setHasOptionsMenu(true);
 
-        String items_file = getContext().getString( getFileResource() );
-
         item_file = new ItemsFile<Item>( getContext(), getFileResource(), getBuilder() );
-
-        list_adapter = new ItemListAdapter<Item>( getContext(), new ArrayList<Item>(), getItemListLayout() );
-        list_adapter.addAll( item_file.getItems() );
-
-        /*
-        AsyncFileReader<Item> file_reader = new AsyncFileReader<>(
-                getContext(), getBuilder(), new AsyncFileReader.Listener<Item>()
-        {
-            @Override
-            public void onResult(ArrayList<Item> items) { list_adapter.addAll(items); }
-        } );
-
-        file_reader.execute(items_file);
-        */
-
         return inflater.inflate(R.layout.itemlist_fragment, container, false);
     }
 
@@ -77,6 +61,9 @@ public abstract class ItemListFragment<Item extends Listable & Detailable & JSON
     public void onStart()
     {
         super.onStart();
+
+        list_adapter = new ItemListAdapter<Item>( getContext(), new ArrayList<Item>(), getItemListLayout() );
+        list_adapter.addAll( item_file.getItems() );
 
         ListView list = getView().findViewById(R.id.list);
         list.setEmptyView( getView().findViewById( R.id.empty_list_view ) );
@@ -91,19 +78,23 @@ public abstract class ItemListFragment<Item extends Listable & Detailable & JSON
             public void onClick(View view)
             {
                 Intent intent = new Intent( getActivity(), getAddItemActivity() );
-                startActivityForResult( intent, REQUEST_ADD_ITEM );
+                startActivityForResult( intent, ADD_ITEM );
             }
         });
     }
 
     @Override
-    public void onStop()
+    public void onActivityResult( int request, int result, Intent intent )
     {
-        //String items_file = getContext().getString( getFileResource() );
-        //AsyncFileSaver<Item> file_saver = new AsyncFileSaver<>( getContext(), items_file, null );
-        //file_saver.execute( list_adapter.getItems() );
+        if (intent == null)
+            return;
 
-        super.onStop();
+        if (request == ADD_ITEM && result == Activity.RESULT_OK)
+        {
+            String item_extra = getString(R.string.item_extra);
+            Item item = intent.getParcelableExtra( item_extra );
+            addNewItem(item);
+        }
     }
 
     @Override
@@ -126,53 +117,32 @@ public abstract class ItemListFragment<Item extends Listable & Detailable & JSON
         }
     }
 
-    @Override
-    public void onActivityResult( int request, int result, Intent intent )
+    void addNewItem( Item new_item )
     {
-        if ( request == REQUEST_ADD_ITEM && result == Activity.RESULT_OK )
+        boolean item_exists=false;
+
+        for ( int i=0; i< list_adapter.getCount(); ++i )
+            if ( list_adapter.getItem(i).equals(new_item) ) { item_exists=true; break; }
+
+        if ( !item_exists )
         {
-            try
-            {
-                String bundle_item = getContext().getString(R.string.bundle_item);
-                Item new_item = intent.getParcelableExtra(bundle_item);
-
-                boolean item_exists=false;
-
-                for ( int i=0; i< list_adapter.getCount(); ++i )
-                    if ( list_adapter.getItem(i).equals(new_item) ) { item_exists=true; break; }
-
-                if ( !item_exists )
-                {
-                    list_adapter.insert(new_item, 0); // add to top of the list
-                    list_adapter.notifyDataSetChanged();
-                    item_file.insert(new_item);
-                    Log.i( TAG, "added item=" + new_item.toString() );
-                }
-                else Snackbar.make( getView(), R.string.duplicate_item, Snackbar.LENGTH_SHORT).show();
-            }
-            catch( Exception ex )
-            {
-                Log.e( TAG, "failed to add item, error=" + ex.getMessage() );
-            }
+            list_adapter.insert(new_item, 0); // add to top of the list
+            list_adapter.notifyDataSetChanged();
+            item_file.insert( new_item, 0 );
+            Log.i( TAG, "added item=" + new_item.toString() );
         }
+        else Snackbar.make( getView(), R.string.duplicate_item, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void onItemClick(AdapterView<?> list, View view, int position, long id )
     {
         Item item = (Item) list.getItemAtPosition(position);
+        String item_extra = getContext().getString(R.string.item_extra);
 
-        String bundle_item = getContext().getString(R.string.bundle_item);
-        Bundle args = new Bundle();
-        args.putParcelable( bundle_item, item );
-
-        Fragment fragment = new ItemDetailsFragment<Item>();
-        fragment.setArguments(args);
-
-        getFragmentManager().beginTransaction()
-                .replace( R.id.fragment_container, fragment )
-                .addToBackStack(null)
-                .commit();
+        Intent intent = new Intent( getActivity(), item.getDetailsActivity() );
+        intent.putExtra( item_extra, item );
+        startActivityForResult( intent, ADD_ITEM );
     }
 
     @Override
@@ -191,8 +161,8 @@ public abstract class ItemListFragment<Item extends Listable & Detailable & JSON
             @Override
             public void onClick(View v)
             {
-                list_adapter.undoRemove();
-                item_file.insert( removed );
+                int position = list_adapter.undoRemove();
+                item_file.insert( removed, position );
             }
         };
 

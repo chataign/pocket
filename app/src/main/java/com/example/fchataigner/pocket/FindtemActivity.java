@@ -1,18 +1,11 @@
 package com.example.fchataigner.pocket;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -26,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.example.fchataigner.pocket.interfaces.Detailable;
 import com.example.fchataigner.pocket.interfaces.Listable;
 import com.example.fchataigner.pocket.interfaces.AsyncResultsListener;
 import com.example.fchataigner.pocket.ocr.OcrCaptureActivity;
@@ -34,14 +28,16 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AddItemActivity<Item extends Parcelable & Listable> extends AppCompatActivity
+public abstract class FindtemActivity<Item extends Parcelable & Listable & Detailable> extends AppCompatActivity
         implements
         SearchView.OnQueryTextListener,
         AsyncResultsListener<Item>,
         ListView.OnItemClickListener
 {
-    static final protected String TAG = "AddItemActivity";
+    static final protected String TAG = "FindtemActivity";
     static final protected String QUERY_DELIMITER = " ";
+    static final public String QUERY = "query";
+    static final private int SEE_DETAILS_AND_ADD = 1;
 
     public abstract String getQueryHints();
     public abstract int getListItemLayout();
@@ -93,6 +89,13 @@ public abstract class AddItemActivity<Item extends Parcelable & Listable> extend
                 startActivityForResult( intent, OcrCaptureActivity.OCR_GET_TEXT );
             }
         } );
+
+        if ( getIntent().hasExtra(QUERY) )
+        {
+            String query = getIntent().getStringExtra(QUERY);
+            query = query.replaceAll("['\"+\n\t]", QUERY_DELIMITER );
+            search_view.setQuery( query, true );
+        }
     }
 
     @Override
@@ -150,12 +153,11 @@ public abstract class AddItemActivity<Item extends Parcelable & Listable> extend
     {
         Item item = (Item) list.getItemAtPosition(position);
 
-        Intent intent = new Intent();
-        String bundle_item = this.getString(R.string.bundle_item);
-        intent.putExtra( bundle_item, item );
+        String item_extra = this.getString(R.string.item_extra);
 
-        setResult( Activity.RESULT_OK, intent );
-        finish();
+        Intent intent = new Intent( this, item.getDetailsActivity() );
+        intent.putExtra( item_extra, item );
+        startActivityForResult( intent, SEE_DETAILS_AND_ADD );
     }
 
     @Override
@@ -164,7 +166,12 @@ public abstract class AddItemActivity<Item extends Parcelable & Listable> extend
         if ( intent == null )
             return;
 
-        if ( request == OcrCaptureActivity.OCR_GET_TEXT && result == CommonStatusCodes.SUCCESS )
+        if ( request == SEE_DETAILS_AND_ADD && result == Activity.RESULT_OK )
+        {
+            setResult( Activity.RESULT_OK, intent );
+            finish();
+        }
+        else if ( request == OcrCaptureActivity.OCR_GET_TEXT && result == CommonStatusCodes.SUCCESS )
         {
             ArrayList<String> ocr_strings = intent.getStringArrayListExtra( OcrCaptureActivity.OCR_TEXT_RESULT );
 

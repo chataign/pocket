@@ -16,7 +16,7 @@
     <string name="category_shops">Shops</string>
     <string name="item_deleted">Item deleted</string>
     <string name="duplicate_item">Duplicate item</string>
-    <string name="bundle_item">item</string>
+    <string name="item_extra">item</string>
     <string name="ok">OK</string>
     <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
     <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
@@ -24,4 +24,5 @@
     <string name="undo">Undo</string>
     <string name="action_share">share</string>
     <string name="action_filter">filter</string>
+    <string name="action_add">add</string>
  </resources>

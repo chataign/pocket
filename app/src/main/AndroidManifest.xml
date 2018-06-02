@@ -39,13 +39,23 @@
         </activity>
 
         <activity
-            android:name=".books.AddBookActivity"
+            android:name=".books.FindBookActivity"
             android:label="Add new book"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".places.AddPlaceActivity"
+            android:name=".books.BookDetailsActivity"
+            android:label="Book details"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".places.FindPlaceActivity"
             android:label="Add new place"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".places.PlaceDetailsActivity"
+            android:label="Place details"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity

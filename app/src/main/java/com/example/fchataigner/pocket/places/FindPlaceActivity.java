@@ -14,7 +14,7 @@ import com.example.fchataigner.pocket.R;
 
 import java.util.ArrayList;
 
-public class AddPlaceActivity extends AddLocalizedItemActivity<Place>
+public class FindPlaceActivity extends AddLocalizedItemActivity<Place>
 {
     private PlaceFinder place_finder=null;
 

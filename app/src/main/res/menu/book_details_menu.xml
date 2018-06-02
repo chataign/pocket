@@ -7,4 +7,10 @@
         android:title="@string/action_share"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/action_add"
+        android:icon="@drawable/ic_add_white_48px"
+        android:title="@string/action_add"
+        app:showAsAction="ifRoom"/>
+
 </menu>

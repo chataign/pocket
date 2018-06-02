@@ -56,7 +56,7 @@ public class Place implements Parcelable, JSONable, Listable, Detailable, Sharea
             "Check out this place: \"%s\" at %s", this.name, this.vicinity ); }
 
     @Override
-    public int getDetailsLayout() { return R.layout.place_details; }
+    public Class<?> getDetailsActivity() { return new PlaceDetailsActivity().getClass(); }
 
     @Override
     public int getItemLayout() { return R.layout.place_item; }
@@ -84,77 +84,6 @@ public class Place implements Parcelable, JSONable, Listable, Detailable, Sharea
             TextView distance_field = view.findViewById(R.id.distance);
             distance_field.setText( String.format( "distance: %dm", distance.intValue() ) );
         }
-    }
-
-    @Override
-    public void createDetailsView( final Context context, final View view )
-    {
-        ImageView image_view = view.findViewById(R.id.icon);
-
-        Picasso.get()
-                .load(icon)
-                .error( R.drawable.ic_launcher_background )
-                .resize(100, 100)
-                .centerCrop()
-                .into(image_view);
-
-        TextView name_view = view.findViewById(R.id.name);
-        name_view.setText(name);
-
-        TextView vicinity_view = view.findViewById(R.id.vicinity);
-        vicinity_view.setText(vicinity);
-
-        TextView types_field = view.findViewById(R.id.types);
-        types_field.setText( types.toString() );
-
-        GetPlaceDetails.OnDetailsReceived details_received = new GetPlaceDetails.OnDetailsReceived()
-        {
-            @Override
-            public void onDetailsReceived(final PlaceDetails details)
-            {
-                final Button website = view.findViewById(R.id.website);
-                website.setOnClickListener( new Button.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        Uri website = Uri.parse(details.website_url);
-                        Intent intent = new Intent(Intent.ACTION_VIEW, website );
-                        context.startActivity(intent);
-                    }
-                } );
-
-                final Button google_maps = view.findViewById(R.id.google_maps);
-                google_maps.setOnClickListener( new Button.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(details.google_maps_url) );
-                        context.startActivity(intent);
-                    }
-                } );
-
-                TextView phone_number = view.findViewById(R.id.phone_number);
-                phone_number.setText( details.phone_number );
-
-                TextView reviews_header = view.findViewById(R.id.reviews_header);
-                reviews_header.setText( String.format( "%d reviews", details.reviews.size() ) );
-
-                LinearLayout reviews_layout = view.findViewById(R.id.reviews);
-                LayoutInflater inflater = LayoutInflater.from(context);
-
-                for ( PlaceReview review : details.reviews)
-                {
-                    View item_view = inflater.inflate(R.layout.review_item, reviews_layout, false);
-                    review.populateView(item_view);
-                    reviews_layout.addView(item_view);
-                }
-            }
-        };
-
-        GetPlaceDetails get_place_details = new GetPlaceDetails( context, details_received );
-        get_place_details.execute( this );
     }
 
     @Override

@@ -1,9 +1,7 @@
 package com.example.fchataigner.pocket;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -14,28 +12,13 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.SearchView;
-import android.widget.TextView;
 
-import com.example.fchataigner.pocket.interfaces.AsyncResultsListener;
+import com.example.fchataigner.pocket.interfaces.Detailable;
 import com.example.fchataigner.pocket.interfaces.Listable;
-import com.example.fchataigner.pocket.ocr.OcrCaptureActivity;
-import com.google.android.gms.common.api.CommonStatusCodes;
 
-import java.util.ArrayList;
-
-public abstract class AddLocalizedItemActivity<Item extends Parcelable & Listable>
-        extends AddItemActivity<Item>
+public abstract class AddLocalizedItemActivity<Item extends Parcelable & Listable & Detailable>
+        extends FindtemActivity<Item>
         implements LocationListener
 {
     static protected String LOCATION_UNAVAILABLE = "Location unavailable";

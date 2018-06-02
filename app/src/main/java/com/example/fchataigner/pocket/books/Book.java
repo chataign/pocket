@@ -65,7 +65,7 @@ public class Book implements Parcelable, JSONable, Listable, Detailable, Shareab
     }
 
     @Override
-    public int getDetailsLayout() { return R.layout.book_details; }
+    public Class<?> getDetailsActivity() { return new BookDetailsActivity().getClass(); }
 
     @Override
     public int getItemLayout() { return R.layout.book_item; }
@@ -105,71 +105,6 @@ public class Book implements Parcelable, JSONable, Listable, Detailable, Shareab
 
         TextView author_view = view.findViewById(R.id.author);
         author_view.setText( author );
-    }
-
-    @Override
-    public void createDetailsView( final Context context, View view )
-    {
-        ImageView image_view = view.findViewById(R.id.thumbnail);
-
-        Picasso.get()
-                .load(thumbnail)
-                .resize(225, 300)
-                .centerCrop()
-                .into(image_view);
-
-        TextView title_view = view.findViewById(R.id.title);
-        title_view.setText(title);
-
-        TextView author_view = view.findViewById(R.id.author);
-        author_view.setText(author);
-
-        TextView ratings = view.findViewById(R.id.ratings);
-        ratings.setText( String.format("%.1f (from %d reviews)", averageRating, ratingsCount ) );
-
-        TextView description_view = view.findViewById(R.id.description);
-        description_view.setText( description );
-
-        TextView publisher_view = view.findViewById(R.id.publisher);
-        publisher_view.setText( publisher );
-
-        TextView date_view = view.findViewById(R.id.date);
-
-        try
-        {
-            date_view.setText( String.format("%s %d", getMonth(), getYear() ) );
-        }
-        catch( ParseException ex )
-        {
-            date_view.setText(date);
-            Log.w( "Book", "failed to parse date, error=" + ex.getMessage() );
-        }
-
-        Button button = view.findViewById(R.id.button);
-        button.setOnClickListener( new Button.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link) );
-                context.startActivity(intent);
-            }
-        } );
-
-        /*
-        GetBookAuthor.Listener author_listener = new GetBookAuthor.Listener()
-        {
-            @Override
-            public void onResults(final ArrayList<BookAuthor> authors )
-            {
-                for ( BookAuthor author : authors )
-                    Log.i( "BookAuthor", "read author: name=" + author.name + " id=" + author.id );
-            }
-        };
-
-        GetBookAuthor get_authors = new GetBookAuthor( context, author_listener );
-        get_authors.execute( this.author );
-        */
     }
 
     @Override

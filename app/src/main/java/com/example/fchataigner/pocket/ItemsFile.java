@@ -28,9 +28,9 @@ public class ItemsFile<Item extends JSONable>
         return file_items;
     }
 
-    void insert( Item item )
+    void insert( Item item, int position )
     {
-        file_items.add(item);
+        file_items.add( position, item );
         save();
     }
 

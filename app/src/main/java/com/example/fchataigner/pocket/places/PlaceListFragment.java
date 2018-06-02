@@ -7,6 +7,6 @@ public class PlaceListFragment extends ItemListFragment<Place>
 {
     protected int getFileResource() { return R.string.places_file; }
     protected int getItemListLayout() { return R.layout.place_item; }
-    protected Class<?> getAddItemActivity() { return AddPlaceActivity.class; }
+    protected Class<?> getAddItemActivity() { return FindPlaceActivity.class; }
     protected Place.Builder getBuilder() { return new Place().new Builder(); }
 }
